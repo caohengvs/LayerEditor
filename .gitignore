@@ -25,6 +25,7 @@
 *.la
 *.a
 *.lib
+*.exp
 
 # Executables
 *.exe
@@ -34,4 +35,5 @@
 # Dir
 bin/
 build/
+lib/
 
