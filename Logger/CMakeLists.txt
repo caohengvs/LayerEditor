@@ -5,7 +5,7 @@ project(Logger)
 
 find_package(spdlog CONFIG REQUIRED)
 
-file(GLOB SOURCES "src/*.cpp" "*.cpp")
+file(GLOB SOURCES "src/*.cpp")
 
 add_library(${PROJECT_NAME} SHARED
     ${SOURCES}
@@ -18,12 +18,11 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog)
-target_compile_definitions(${PROJECT_NAME} PRIVATE LOGGER_EXPORTS)
+target_compile_definitions(${PROJECT_NAME} PRIVATE MYLOGGER_EXPORTS)
 
 set(OUTPUT_DIR ${CMAKE_ROOT_DIR})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES 
-    # VS_DEBUGGER_WORKING_DIRECTORY ${OUTPUT_DIR}
     RUNTIME_OUTPUT_DIRECTORY_DEBUG ${OUTPUT_DIR}/bin
     LIBRARY_OUTPUT_DIRECTORY_DEBUG ${OUTPUT_DIR}/${PROJECT_NAME}/lib
     ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${OUTPUT_DIR}/${PROJECT_NAME}/lib
