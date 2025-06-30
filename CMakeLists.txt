@@ -25,7 +25,7 @@ add_executable(project1 main.cpp)
 
 target_link_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/Logger/lib
-     ${CMAKE_CURRENT_SOURCE_DIR}/WindowManager/lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/WindowManager/lib
 )
 
 target_link_libraries(${PROJECT_NAME} 

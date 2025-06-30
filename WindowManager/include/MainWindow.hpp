@@ -14,8 +14,8 @@ public:
     ~MainWindow();
 
 private slots:
-    void onCreateNewWindowClicked(); 
+    void onUpdate(); 
 
 private:
-    QPushButton *createNewWindowButton;
+    std::unique_ptr<QPushButton> m_btnUpdate;
 };

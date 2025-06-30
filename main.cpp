@@ -1,5 +1,5 @@
 #include <QApplication>
-#include "TestWindow.hpp"
+#include "MainWindow.hpp"
 #include "logger/include/MyLogger.hpp"
 
 #include <iostream>
@@ -15,8 +15,6 @@ int main(int argc, char** argv)
     app.setApplicationName("MyApplication");
 
     MainWindow mainWindow;
-    mainWindow.setWindowTitle("Test Window");
-    mainWindow.setGeometry(100, 100, 800, 600);
     mainWindow.show();
 
     return app.exec();

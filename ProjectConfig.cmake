@@ -1,4 +1,5 @@
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE LIB_EXPORT)
 set(OUTPUT_DIR ${CMAKE_ROOT_DIR})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES 
@@ -21,7 +22,7 @@ install(TARGETS ${PROJECT_NAME}
 )
 
 install(FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/ILogger.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/interface/*.hpp
     DESTINATION include/${PROJECT_NAME}
 )
 

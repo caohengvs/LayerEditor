@@ -1,0 +1,10 @@
+{
+  "name": "3rd-party",
+  "version-string": "1.0.0",
+  "dependencies": [
+    "spdlog"
+  ],
+  "default-features": [
+    "spdlog"
+  ]
+}
