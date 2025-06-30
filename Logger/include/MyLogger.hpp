@@ -1,19 +1,10 @@
 // MyLogger.h
 #pragma once
 
-#ifdef _WIN32
-#ifdef MYLOGGER_EXPORTS
-#define MYLOGGER_API __declspec(dllexport)
-#else
-#define MYLOGGER_API __declspec(dllimport)
-#endif
-#else
-#define MYLOGGER_API
-#endif
-
 #include <memory>
 #include <ostream>
 #include <string>
+#include "CommonDef/ExportDef.h"
 
 namespace spdlog
 {
@@ -24,7 +15,7 @@ enum level_enum : int;
 }
 }  // namespace spdlog
 
-class MYLOGGER_API MyLogger
+class LIB_API MyLogger
 {
 public:
     enum LogLevel
@@ -66,7 +57,7 @@ private:
     friend class LogStream;
 };
 
-class MYLOGGER_API MyLogger::LogStream
+class LIB_API MyLogger::LogStream
 {
 public:
     LogStream(LogLevel level, MyLoggerImpl* loggerImpl, const char* file = nullptr, int line = 0,
@@ -75,11 +66,11 @@ public:
     ~LogStream();
 
     template<typename T>
-    MyLogger::LogStream& operator<<(const T& val);
+    LogStream& operator<<(const T& val);
 
-    MyLogger::LogStream& operator<<(std::ostream& (*manip)(std::ostream&));
+    LogStream& operator<<(std::ostream& (*manip)(std::ostream&));
 
-    MyLogger::LogStream& operator<<(const char* str);
+    LogStream& operator<<(const char* str);
 
 private:
     std::unique_ptr<LogStreamImpl> pimpl_;
