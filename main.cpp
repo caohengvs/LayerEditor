@@ -12,10 +12,10 @@ int main(int argc, char** argv)
 
     QApplication app(argc, argv);
 
-    app.setApplicationName("My Application");
+    app.setApplicationName("MyApplication");
+
     MainWindow mainWindow;
     mainWindow.setWindowTitle("Test Window");
-
     mainWindow.setGeometry(100, 100, 800, 600);
     mainWindow.show();
 
