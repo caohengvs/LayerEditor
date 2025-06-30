@@ -19,10 +19,10 @@ A thread-safe, asynchronous logging library built as a wrapper around spdlog.
 - 🔌 DLL export support for Windows
 
 ## 📋 Dependencies
-
 - spdlog v1.15.3 or later
 - vcpkg package manager
 - CMake 3.20.0 or later
+- opencv 4.5.1 or later
 - C++17 compiler
 
 ## 🚀 Quick Start
@@ -35,7 +35,7 @@ git clone https://github.com/caohengvs/CppTools.git
 cd CppTools
 
 # Configure with vcpkg
-cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=D:/vcpkg/scripts/buildsystems/vcpkg.cmake
+cmake -B build -S .
 
 # Build
 cmake --build build --config Release
@@ -67,20 +67,25 @@ int main() {
 ## 📁 Project Structure
 
 ```
-project1/
-├── Logger/
+CppTools/
+├── Logger/           # 日志库模块（封装spdlog）
+│   ├── include/      # 头文件（如CLogger.hpp、ILogger.hpp等）
+│   ├── src/          # 源文件（如CLogger.cpp）
+│   └── CMakeLists.txt
+├── WindowManager/    # 窗口管理模块
 │   ├── include/
-│   │   ├── CLogger.hpp      # Core logger implementation
-│   │   ├── ILogger.hpp      # Logger interface
-│   │   ├── ExportDefine.h   # DLL export definitions
-│   │   └── GlobalDefine.h   # Global definitions
 │   ├── src/
-│   │   └── CLogger.cpp      # Implementation
-│   └── CMakeLists.txt       # Logger build config
-├── main.cpp                 # Example usage
-├── CMakeLists.txt          # Main build config
-└── ReadMe.md               # This file
-```
+│   └── CMakeLists.txt
+├── ImageProcessor/   # 图像处理模块
+│   ├── include/
+│   ├── src/
+│   └── CMakeLists.txt
+├── CommonDef/        # 公共定义
+│   └── include/
+├── main.cpp          # 示例或主程序入口
+├── CMakeLists.txt    # 项目主CMake配置
+└── README.md         # 项目说明文档
+``
 
 ## ⚙️ Configuration
 
