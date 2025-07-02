@@ -1,4 +1,4 @@
-// MyLogger.h
+// Logger.h
 #pragma once
 
 #include <memory>
@@ -22,7 +22,7 @@ enum level_enum : int;
 }
 }  // namespace spdlog
 
-class LIB_API MyLogger
+class LIB_API Logger
 {
 public:
     enum LogLevel
@@ -36,12 +36,11 @@ public:
         OFF_L
     };
 
-    static MyLogger& getInstance();
+    static Logger& getInstance();
     static void deleteInstance();
 
-    void init(const std::string& loggerName = "console", LogLevel level = INFO_L, bool enableConsole = true,
-              const std::string& filePath = "", size_t maxFileSize = 1048576 * 5, size_t maxFiles = 3,
-              bool isSync = false);
+    void init(const std::string& loggerName = "console", LogLevel level = INFO_L, bool enableConsole = true, bool isSync = false,
+              const std::string& filePath = "", size_t maxFileSize = 1048576 * 5, size_t maxFiles = 3);
 
     class LogStream;
 
@@ -53,30 +52,30 @@ public:
     LogStream error(const char* file, int line, const char* func);
     LogStream critical(const char* file, int line, const char* func);
 
-    MyLogger(const MyLogger&) = delete;
-    MyLogger& operator=(const MyLogger&) = delete;
+    Logger(const Logger&) = delete;
+    Logger& operator=(const Logger&) = delete;
 
 private:
     void initSync(std::vector<spdlog::sink_ptr>, const std::string&, LogLevel);
     void initAsync(std::vector<spdlog::sink_ptr>, const std::string&, LogLevel);
 
 private:
-    MyLogger();
-    ~MyLogger();
+    Logger();
+    ~Logger();
 
-    struct MyLoggerImpl;
-    std::unique_ptr<MyLoggerImpl> pimpl_;
-    static inline MyLogger* m_pInstance = nullptr;
+    struct LoggerImpl;
+    std::unique_ptr<LoggerImpl> pimpl_;
+    static inline Logger* m_pInstance = nullptr;
     static inline std::mutex m_mtxCreate;
 
     struct LogStreamImpl;
     friend class LogStream;
 };
 
-class LIB_API MyLogger::LogStream
+class LIB_API Logger::LogStream
 {
 public:
-    LogStream(LogLevel level, MyLoggerImpl* loggerImpl, const char* file = nullptr, int line = 0,
+    LogStream(LogLevel level, LoggerImpl* loggerImpl, const char* file = nullptr, int line = 0,
               const char* func = nullptr);
 
     ~LogStream();
@@ -92,12 +91,12 @@ private:
     std::unique_ptr<LogStreamImpl> pimpl_;
 };
 
-#define INIT_LOGGER(...) MyLogger::getInstance().init(__VA_ARGS__)
-#define DELETE_LOGGER(...) MyLogger::deleteInstance()
+#define INIT_LOGGER(...) Logger::getInstance().init(__VA_ARGS__)
+#define DELETE_LOGGER(...) Logger::deleteInstance()
 
-#define LOG_TRACE MyLogger::getInstance().trace(__FILE__, __LINE__, __FUNCTION__)
-#define LOG_DEBUG MyLogger::getInstance().debug(__FILE__, __LINE__, __FUNCTION__)
-#define LOG_INFO MyLogger::getInstance().info(__FILE__, __LINE__, __FUNCTION__)
-#define LOG_WARN MyLogger::getInstance().warn(__FILE__, __LINE__, __FUNCTION__)
-#define LOG_ERROR MyLogger::getInstance().error(__FILE__, __LINE__, __FUNCTION__)
-#define LOG_CRITICAL MyLogger::getInstance().critical(__FILE__, __LINE__, __FUNCTION__)
+#define LOG_TRACE Logger::getInstance().trace(__FILE__, __LINE__, __FUNCTION__)
+#define LOG_DEBUG Logger::getInstance().debug(__FILE__, __LINE__, __FUNCTION__)
+#define LOG_INFO Logger::getInstance().info(__FILE__, __LINE__, __FUNCTION__)
+#define LOG_WARN Logger::getInstance().warn(__FILE__, __LINE__, __FUNCTION__)
+#define LOG_ERROR Logger::getInstance().error(__FILE__, __LINE__, __FUNCTION__)
+#define LOG_CRITICAL Logger::getInstance().critical(__FILE__, __LINE__, __FUNCTION__)

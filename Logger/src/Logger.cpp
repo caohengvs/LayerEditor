@@ -1,4 +1,4 @@
-#include "MyLogger.hpp"
+#include "Logger.hpp"
 #include <spdlog/async.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -6,27 +6,27 @@
 #include <sstream>
 #include <vector>
 
-struct MyLogger::MyLoggerImpl
+struct Logger::LoggerImpl
 {
     std::shared_ptr<spdlog::logger> logger_;
 
-    static spdlog::level::level_enum mapLogLevel(MyLogger::LogLevel level)
+    static spdlog::level::level_enum mapLogLevel(Logger::LogLevel level)
     {
         switch (level)
         {
-            case MyLogger::TRACE_L:
+            case Logger::TRACE_L:
                 return spdlog::level::trace;
-            case MyLogger::DEBUG_L:
+            case Logger::DEBUG_L:
                 return spdlog::level::debug;
-            case MyLogger::INFO_L:
+            case Logger::INFO_L:
                 return spdlog::level::info;
-            case MyLogger::WARN_L:
+            case Logger::WARN_L:
                 return spdlog::level::warn;
-            case MyLogger::ERROR_L:
+            case Logger::ERROR_L:
                 return spdlog::level::err;
-            case MyLogger::CRITICAL_L:
+            case Logger::CRITICAL_L:
                 return spdlog::level::critical;
-            case MyLogger::OFF_L:
+            case Logger::OFF_L:
                 return spdlog::level::off;
             default:
                 return spdlog::level::info;
@@ -34,24 +34,24 @@ struct MyLogger::MyLoggerImpl
     }
 };
 
-MyLogger::MyLogger()
-    : pimpl_(std::make_unique<MyLoggerImpl>())
+Logger::Logger()
+    : pimpl_(std::make_unique<LoggerImpl>())
 {
 }
 
-MyLogger::~MyLogger() = default;
+Logger::~Logger() = default;
 
-MyLogger& MyLogger::getInstance()
+Logger& Logger::getInstance()
 {
     if (m_pInstance)
         return *m_pInstance;
 
     std::lock_guard lock(m_mtxCreate);
-    m_pInstance = new MyLogger;
+    m_pInstance = new Logger;
     return *m_pInstance;
 }
 
-void MyLogger::deleteInstance()
+void Logger::deleteInstance()
 {
     if (!m_pInstance)
         return;
@@ -61,8 +61,8 @@ void MyLogger::deleteInstance()
     m_pInstance = nullptr;
 }
 
-void MyLogger::init(const std::string& loggerName, MyLogger::LogLevel level, bool enableConsole,
-                    const std::string& filePath, size_t maxFileSize, size_t maxFiles, bool isSync)
+void Logger::init(const std::string& loggerName, Logger::LogLevel level, bool enableConsole, bool isSync,
+                  const std::string& filePath, size_t maxFileSize, size_t maxFiles)
 {
     if (pimpl_->logger_)
         return;
@@ -83,7 +83,7 @@ void MyLogger::init(const std::string& loggerName, MyLogger::LogLevel level, boo
         initAsync(sinks, loggerName, level);
 }
 
-void MyLogger::initSync(std::vector<spdlog::sink_ptr> sinks, const std::string& loggerName, LogLevel level)
+void Logger::initSync(std::vector<spdlog::sink_ptr> sinks, const std::string& loggerName, LogLevel level)
 {
     if (sinks.empty())
     {
@@ -99,13 +99,13 @@ void MyLogger::initSync(std::vector<spdlog::sink_ptr> sinks, const std::string& 
     {
         pimpl_->logger_ = std::make_shared<spdlog::logger>(loggerName, begin(sinks), end(sinks));
     }
-    pimpl_->logger_->set_level(MyLoggerImpl::mapLogLevel(level));
+    pimpl_->logger_->set_level(LoggerImpl::mapLogLevel(level));
     pimpl_->logger_->set_pattern("[%Y-%m-%d %H:%M:%S.%e][%^%l%$][TID:%t][%s:%#:%!] %v");
     spdlog::set_default_logger(pimpl_->logger_);
-    pimpl_->logger_->flush_on(MyLoggerImpl::mapLogLevel(level));
+    pimpl_->logger_->flush_on(LoggerImpl::mapLogLevel(level));
 }
 
-void MyLogger::initAsync(std::vector<spdlog::sink_ptr> sinks, const std::string& loggerName, LogLevel level)
+void Logger::initAsync(std::vector<spdlog::sink_ptr> sinks, const std::string& loggerName, LogLevel level)
 {
     if (sinks.empty())
     {
@@ -126,22 +126,22 @@ void MyLogger::initAsync(std::vector<spdlog::sink_ptr> sinks, const std::string&
     }
 
     spdlog::flush_every(std::chrono::milliseconds(500));
-    pimpl_->logger_->set_level(MyLoggerImpl::mapLogLevel(level));
+    pimpl_->logger_->set_level(LoggerImpl::mapLogLevel(level));
     pimpl_->logger_->set_pattern("[%Y-%m-%d %H:%M:%S.%e][%^%l%$][TID:%t][%s:%#:%!] %v");
     spdlog::set_default_logger(pimpl_->logger_);
-    pimpl_->logger_->flush_on(MyLoggerImpl::mapLogLevel(level));
+    pimpl_->logger_->flush_on(LoggerImpl::mapLogLevel(level));
 }
 
-struct MyLogger::LogStreamImpl
+struct Logger::LogStreamImpl
 {
-    MyLogger::LogLevel level_;
+    Logger::LogLevel level_;
     std::ostringstream ss_;
     std::shared_ptr<spdlog::logger> logger_;
     const char* file_;
     int line_;
     const char* func_;
 
-    LogStreamImpl(MyLogger::LogLevel level, std::shared_ptr<spdlog::logger> logger, const char* file, int line,
+    LogStreamImpl(Logger::LogLevel level, std::shared_ptr<spdlog::logger> logger, const char* file, int line,
                   const char* func)
         : level_(level)
         , logger_(std::move(logger))
@@ -152,23 +152,23 @@ struct MyLogger::LogStreamImpl
     }
 };
 
-MyLogger::LogStream::LogStream(MyLogger::LogLevel level, MyLoggerImpl* loggerImpl, const char* file, int line,
-                               const char* func)
+Logger::LogStream::LogStream(Logger::LogLevel level, LoggerImpl* loggerImpl, const char* file, int line,
+                             const char* func)
     : pimpl_(std::make_unique<LogStreamImpl>(level, loggerImpl->logger_, file, line, func))
 {
 }
 
-MyLogger::LogStream::~LogStream()
+Logger::LogStream::~LogStream()
 {
     if (pimpl_ && pimpl_->logger_)
     {
         pimpl_->logger_->log({pimpl_->file_, pimpl_->line_, pimpl_->func_},
-                             MyLogger::MyLoggerImpl::mapLogLevel(pimpl_->level_), pimpl_->ss_.str());
+                             Logger::LoggerImpl::mapLogLevel(pimpl_->level_), pimpl_->ss_.str());
     }
 }
 
 template<typename T>
-MyLogger::LogStream& MyLogger::LogStream::operator<<(const T& val)
+Logger::LogStream& Logger::LogStream::operator<<(const T& val)
 {
     if (pimpl_ && pimpl_->ss_)
     {
@@ -177,13 +177,13 @@ MyLogger::LogStream& MyLogger::LogStream::operator<<(const T& val)
     return *this;
 }
 
-MyLogger::LogStream& MyLogger::LogStream::operator<<(std::ostream& (*manip)(std::ostream&))
+Logger::LogStream& Logger::LogStream::operator<<(std::ostream& (*manip)(std::ostream&))
 {
     manip(pimpl_->ss_);
     return *this;
 }
 
-MyLogger::LogStream& MyLogger::LogStream::operator<<(const char* str)
+Logger::LogStream& Logger::LogStream::operator<<(const char* str)
 {
     if (pimpl_ && pimpl_->ss_)
     {
@@ -192,61 +192,61 @@ MyLogger::LogStream& MyLogger::LogStream::operator<<(const char* str)
     return *this;
 }
 
-MyLogger::LogStream MyLogger::log(LogLevel eLevel, const char* file, int line, const char* func)
+Logger::LogStream Logger::log(LogLevel eLevel, const char* file, int line, const char* func)
 {
     return LogStream(eLevel, pimpl_.get(), file, line, func);
 }
 
-MyLogger::LogStream MyLogger::trace(const char* file, int line, const char* func)
+Logger::LogStream Logger::trace(const char* file, int line, const char* func)
 {
     return LogStream(TRACE_L, pimpl_.get(), file, line, func);
 }
 
-MyLogger::LogStream MyLogger::debug(const char* file, int line, const char* func)
+Logger::LogStream Logger::debug(const char* file, int line, const char* func)
 {
     return LogStream(DEBUG_L, pimpl_.get(), file, line, func);
 }
 
-MyLogger::LogStream MyLogger::info(const char* file, int line, const char* func)
+Logger::LogStream Logger::info(const char* file, int line, const char* func)
 {
     return LogStream(INFO_L, pimpl_.get(), file, line, func);
 }
 
-MyLogger::LogStream MyLogger::warn(const char* file, int line, const char* func)
+Logger::LogStream Logger::warn(const char* file, int line, const char* func)
 {
     return LogStream(WARN_L, pimpl_.get(), file, line, func);
 }
 
-MyLogger::LogStream MyLogger::error(const char* file, int line, const char* func)
+Logger::LogStream Logger::error(const char* file, int line, const char* func)
 {
     return LogStream(ERROR_L, pimpl_.get(), file, line, func);
 }
 
-MyLogger::LogStream MyLogger::critical(const char* file, int line, const char* func)
+Logger::LogStream Logger::critical(const char* file, int line, const char* func)
 {
     return LogStream(CRITICAL_L, pimpl_.get(), file, line, func);
 }
 
 // 显式模板实例化
-template LIB_API MyLogger::LogStream& MyLogger::LogStream::operator<<(const char&);
-template LIB_API MyLogger::LogStream& MyLogger::LogStream::operator<<(const short&);
-template LIB_API MyLogger::LogStream& MyLogger::LogStream::operator<<(const int&);
-template LIB_API MyLogger::LogStream& MyLogger::LogStream::operator<<(const long&);
-template LIB_API MyLogger::LogStream& MyLogger::LogStream::operator<<(const long long&);
-template LIB_API MyLogger::LogStream& MyLogger::LogStream::operator<<(const unsigned char&);
-template LIB_API MyLogger::LogStream& MyLogger::LogStream::operator<<(const unsigned short&);
-template LIB_API MyLogger::LogStream& MyLogger::LogStream::operator<<(const unsigned int&);
-template LIB_API MyLogger::LogStream& MyLogger::LogStream::operator<<(const unsigned long&);
-template LIB_API MyLogger::LogStream& MyLogger::LogStream::operator<<(const unsigned long long&);
-template LIB_API MyLogger::LogStream& MyLogger::LogStream::operator<<(const float&);
-template LIB_API MyLogger::LogStream& MyLogger::LogStream::operator<<(const double&);
-template LIB_API MyLogger::LogStream& MyLogger::LogStream::operator<<(const long double&);
-template LIB_API MyLogger::LogStream& MyLogger::LogStream::operator<<(const bool&);
-template LIB_API MyLogger::LogStream& MyLogger::LogStream::operator<<(const void* const&);
-template LIB_API MyLogger::LogStream& MyLogger::LogStream::operator<<(const std::string&);
+template LIB_API Logger::LogStream& Logger::LogStream::operator<<(const char&);
+template LIB_API Logger::LogStream& Logger::LogStream::operator<<(const short&);
+template LIB_API Logger::LogStream& Logger::LogStream::operator<<(const int&);
+template LIB_API Logger::LogStream& Logger::LogStream::operator<<(const long&);
+template LIB_API Logger::LogStream& Logger::LogStream::operator<<(const long long&);
+template LIB_API Logger::LogStream& Logger::LogStream::operator<<(const unsigned char&);
+template LIB_API Logger::LogStream& Logger::LogStream::operator<<(const unsigned short&);
+template LIB_API Logger::LogStream& Logger::LogStream::operator<<(const unsigned int&);
+template LIB_API Logger::LogStream& Logger::LogStream::operator<<(const unsigned long&);
+template LIB_API Logger::LogStream& Logger::LogStream::operator<<(const unsigned long long&);
+template LIB_API Logger::LogStream& Logger::LogStream::operator<<(const float&);
+template LIB_API Logger::LogStream& Logger::LogStream::operator<<(const double&);
+template LIB_API Logger::LogStream& Logger::LogStream::operator<<(const long double&);
+template LIB_API Logger::LogStream& Logger::LogStream::operator<<(const bool&);
+template LIB_API Logger::LogStream& Logger::LogStream::operator<<(const void* const&);
+template LIB_API Logger::LogStream& Logger::LogStream::operator<<(const std::string&);
 
 // C++17 string_view 支持
 #if __cplusplus >= 201703L
 #include <string_view>
-template LIB_API MyLogger::LogStream& MyLogger::LogStream::operator<<(const std::string_view&);
+template LIB_API Logger::LogStream& Logger::LogStream::operator<<(const std::string_view&);
 #endif

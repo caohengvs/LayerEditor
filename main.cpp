@@ -1,23 +1,24 @@
 #include <QApplication>
 #include <QDebug>
 #include <iostream>
+#include "Logger.hpp"
 #include "MainWindow.hpp"
-#include "MyLogger.hpp"
 
 int main(int argc, char** argv)
 {
-    auto & loggger = MyLogger::getInstance();
-    loggger.init("MyApplication", MyLogger::DEBUG_L, true, "logs/app.log",true);
+    auto& loggger = Logger::getInstance();
+    loggger.init("MyApplication", Logger::DEBUG_L, true, true, "logs/app.log");
 
     QApplication app(argc, argv);
 
     app.setApplicationName("LayerEditor");
     QIcon appIcon(":/icons/app.svg");
     app.setWindowIcon(appIcon);
+
     qInstallMessageHandler(
         [](QtMsgType type, const QMessageLogContext& context, const QString& msg)
         {
-            auto& logger = MyLogger::getInstance();
+            auto& logger = Logger::getInstance();
 
             switch (type)
             {
@@ -55,7 +56,7 @@ int main(int argc, char** argv)
                      {
                          qInfo() << "Application is about to quit.";
                          delete mainWindow;
-                         MyLogger::deleteInstance();
+                         Logger::deleteInstance();
                      });
 
     return app.exec();

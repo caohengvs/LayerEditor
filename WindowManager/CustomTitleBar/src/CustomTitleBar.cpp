@@ -1,8 +1,9 @@
 #include "CustomTitleBar.hpp"
 #include <QApplication>
+#include <QDebug>
 #include <QScreen>
 #include <QStyle>
-#include "MyLogger.hpp"
+
 
 CustomTitleBar::CustomTitleBar(QMainWindow* mainWindow, QWidget* parent)
     : QWidget(parent)
@@ -15,15 +16,15 @@ CustomTitleBar::CustomTitleBar(QMainWindow* mainWindow, QWidget* parent)
     m_closeButton = new QPushButton();
     QLabel* iconLabel = new QLabel(this);
     QPixmap pixmap(":/icons/app.svg");
-    iconLabel->setPixmap(pixmap.scaled(30,30, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    iconLabel->setPixmap(pixmap.scaled(30, 30, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     iconLabel->setAlignment(Qt::AlignCenter);
     auto setupButton = [](QPushButton* btn, const QString& strPath)
     {
-        int w = 32, h = 32;
+        int w = 30, h = 30;
         btn->setFixedSize(w, h);
         QIcon tmpIcon(strPath);
         btn->setIcon(tmpIcon);
-        btn->setIconSize(QSize(w, h));
+        btn->setIconSize(QSize(w * 2 / 3, h * 2 / 3));
         btn->setFlat(true);
         btn->setStyleSheet(
             "QPushButton { border: none; background-color: transparent;}"
@@ -50,7 +51,7 @@ CustomTitleBar::CustomTitleBar(QMainWindow* mainWindow, QWidget* parent)
 
 CustomTitleBar::~CustomTitleBar()
 {
-    LOG_DEBUG << "CustomTitleBar destructor called";
+    qDebug() << "CustomTitleBar destructor called";
 }
 
 void CustomTitleBar::mousePressEvent(QMouseEvent* event)
