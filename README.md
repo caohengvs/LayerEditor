@@ -90,7 +90,7 @@ Give a ⭐️ if this project helped you!
 ## 📊 Stats
 
 ![GitHub Stats](https://github-readme-stats.vercel.app/api?username=caohengvs&show_icons=true)
-![GitHub Activity Graph](https://activity-graph.herokuapp.com/graph?username=caohengvs&theme=github)
+<!-- ![GitHub Activity Graph](https://github-readme-stats.vercel.app/api/activities?username=caohengvs&hide_title=true&theme=github) -->
 
 ## 📫 Contact
 
