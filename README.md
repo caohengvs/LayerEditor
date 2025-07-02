@@ -89,8 +89,8 @@ Give a ⭐️ if this project helped you!
 
 ## 📊 Stats
 
-![GitHub Stats](https://github-readme-stats.vercel.app/api?username=yourusername&show_icons=true)
-![GitHub Activity Graph](https://activity-graph.herokuapp.com/graph?username=yourusername&theme=github)
+![GitHub Stats](https://github-readme-stats.vercel.app/api?username=caohengvs&show_icons=true)
+![GitHub Activity Graph](https://activity-graph.herokuapp.com/graph?username=caohengvs&theme=github)
 
 ## 📫 Contact
 
@@ -98,4 +98,4 @@ Give a ⭐️ if this project helped you!
 - Email: caohengvs@163.com
 
 ---
-Made with ❤️ by [curtis](https://github.com/caohengvs)
+Made with ❤️ by [Curtis](https://github.com/caohengvs)
