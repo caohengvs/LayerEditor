@@ -1,19 +1,18 @@
-# Logger Library
+# LayerEditor
 
-[![GitHub stars](https://img.shields.io/github/stars/yourusername/project1)](https://github.com/yourusername/project1/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/yourusername/project1)](https://github.com/yourusername/project1/network)
-[![GitHub issues](https://img.shields.io/github/issues/yourusername/project1)](https://github.com/yourusername/project1/issues)
-[![GitHub license](https://img.shields.io/github/license/yourusername/project1)](https://github.com/yourusername/project1/blob/master/LICENSE)
-[![Build Status](https://github.com/yourusername/project1/workflows/CI/badge.svg)](https://github.com/yourusername/project1/actions)
+[![GitHub stars](https://img.shields.io/github/stars/caohengvs/LayerEditor)](https://github.com/caohengvs/LayerEditor/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/caohengvs/LayerEditor)](https://github.com/caohengvs/LayerEditor/network)
+[![GitHub issues](https://img.shields.io/github/issues/caohengvs/LayerEditor)](https://github.com/caohengvs/LayerEditor/issues)
+[![GitHub license](https://img.shields.io/github/license/caohengvs/LayerEditor)](https://github.com/caohengvs/LayerEditor/blob/master/LICENSE)
+<!-- [![Build Status](https://github.com/caohengvs/LayerEditor/actions/workflows/CI.yml/badge.svg)](https://github.com/caohengvs/LayerEditor/actions/workflows/CI.yml) -->
 
-A thread-safe, asynchronous logging library built as a wrapper around spdlog.
+图像视频处理应用
 
 ## ✨ Features
-待补充
+- vcpkg package managed
 
 ## 📋 Dependencies
-- spdlog v1.15.3 or later
-- vcpkg package manager
+- spdlog v1.15.3 or laer
 - CMake 3.20.0 or later
 - opencv 4.5.1 or later
 - C++17 compiler(msvc)
@@ -25,10 +24,10 @@ A thread-safe, asynchronous logging library built as a wrapper around spdlog.
 
 ```bash
 # Clone the repository
-git clone https://github.com/caohengvs/CppTools.git
-cd CppTools
+git clone https://github.com/caohengvs/LayerEditor.git
+cd LayerEditor
 
-# Configure with vcpkg
+# Configure
 cmake -B build -S .
 
 # Build
@@ -40,7 +39,7 @@ cmake --build build --config Release
 ## 📁 Project Structure
 
 ```
-CppTools/
+LayerEditor/
 ├── Logger/           # 日志库模块（封装spdlog）
 │   ├── include/      # 头文件（如CLogger.hpp、ILogger.hpp等）
 │   ├── src/          # 源文件（如CLogger.cpp）
