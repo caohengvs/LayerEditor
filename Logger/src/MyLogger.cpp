@@ -6,7 +6,6 @@
 #include <sstream>
 #include <vector>
 
-
 struct MyLogger::MyLoggerImpl
 {
     std::shared_ptr<spdlog::logger> logger_;
@@ -140,6 +139,11 @@ MyLogger::LogStream& MyLogger::LogStream::operator<<(const char* str)
         pimpl_->ss_ << str;
     }
     return *this;
+}
+
+MyLogger::LogStream MyLogger::log(LogLevel eLevel, const char* file, int line, const char* func)
+{
+    return LogStream(eLevel, pimpl_.get(), file, line, func);
 }
 
 MyLogger::LogStream MyLogger::trace(const char* file, int line, const char* func)

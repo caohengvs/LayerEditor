@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图像/视频编辑解析软件</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden; /* Prevent body scroll when resizing panels */
+        }
+        /* Custom scrollbar styles for dark theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #27272a; /* zinc-800 */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3f3f46; /* zinc-700 */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #52525b; /* zinc-600 */
+        }
+        .resizer {
+            background-color: #3f3f46; /* zinc-700 */
+            transition: background-color 0.2s;
+        }
+        .resizer:hover {
+            background-color: #3b82f6; /* blue-500 */
+        }
+        .resizer-horizontal {
+            cursor: ns-resize;
+            height: 8px;
+        }
+        .resizer-vertical {
+            cursor: ew-resize;
+            width: 8px;
+        }
+    </style>
+</head>
+<body class="bg-zinc-900 text-zinc-200">
+    <div class="flex flex-col h-screen">
+        <!-- 菜单栏 (Menu Bar) -->
+        <div class="h-10 bg-zinc-800 flex items-center px-4 shadow-md border-b border-zinc-700">
+            <span class="text-sm font-semibold text-zinc-300 mr-6">文件</span>
+            <span class="text-sm font-semibold text-zinc-300 mr-6">编辑</span>
+            <span class="text-sm font-semibold text-zinc-300 mr-6">视图</span>
+            <span class="text-sm font-semibold text-zinc-300 mr-6">图像</span>
+            <span class="text-sm font-semibold text-zinc-300 mr-6">视频</span>
+            <span class="text-sm font-semibold text-zinc-300 mr-6">解析</span>
+            <span class="text-sm font-semibold text-zinc-300 mr-6">窗口</span>
+            <span class="text-sm font-semibold text-zinc-300">帮助</span>
+            
+            <!-- 窗口控制按钮 -->
+            <div class="ml-auto flex items-center space-x-1">
+                <!-- 设置按钮 -->
+                <button class="p-1 rounded-md hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors duration-200"
+                        onclick="alert('打开设置 (在实际应用中会触发设置界面)')">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <!-- Redesigned settings icon path -->
+                        <path fill-rule="evenodd" d="M11.49 3.17c-.325-1.119-1.353-1.92-2.5-1.92s-2.175.801-2.5 1.92A9.006 9.006 0 002 10c0 1.258.413 2.434 1.11 3.33.325 1.119 1.353 1.92 2.5 1.92s2.175-.801 2.5-1.92A9.006 9.006 0 0018 10c0-1.258-.413-2.434-1.11-3.33-.325-1.119-1.353-1.92-2.5-1.92s-2.175.801-2.5 1.92A9.006 9.006 0 0011.49 3.17zm-1.49 1.43a.75.75 0 00-1.5 0v.667a.75.75 0 001.5 0v-.667zM10 16a.75.75 0 00-.75.75v.667a.75.75 0 001.5 0v-.667A.75.75 0 0010 16zm-5.636-4.508a.75.75 0 00-1.06-1.06l-.47-.47a.75.75 0 00-1.06 1.06l.47.47a.75.75 0 001.06 0zM15.636 9.442a.75.75 0 00-1.06 1.06l.47.47a.75.75 0 001.06-1.06l-.47-.47zM4.364 9.442a.75.75 0 00-1.06 1.06l-.47-.47a.75.75 0 001.06-1.06l.47.47zM15.636 10.558a.75.75 0 00-1.06-1.06l-.47-.47a.75.75 0 00-1.06 1.06l.47.47zM10 5.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9z" clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+                <!-- 最小化按钮 -->
+                <button class="p-1 rounded-md hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors duration-200"
+                        onclick="alert('最小化应用程序 (在实际应用中会触发最小化逻辑)')">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4 10a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+                <!-- 最大化/还原按钮 -->
+                <button id="maximize-restore-btn" class="p-1 rounded-md hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors duration-200"
+                        onclick="toggleMaximizeRestore()">
+                    <svg id="maximize-icon" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm2-1a1 1 0 00-1 1v10a1 1 0 001 1h10a1 1 0 001-1V5a1 1 0 00-1-1H5z" clip-rule="evenodd"></path>
+                    </svg>
+                    <svg id="restore-icon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 5a2 2 0 00-2 2v3a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h5zm0 2a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1V8a1 1 0 00-1-1h-2zM15 10a2 2 0 00-2 2v3a2 2 0 01-2 2H7a2 2 0 01-2-2v-3a2 2 0 00-2-2H3a2 2 0 00-2 2v3a4 4 0 004 4h8a4 4 0 004-4v-3a2 2 0 00-2-2h-2z" clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+                <!-- 关闭按钮 -->
+                <button class="p-1 rounded-md hover:bg-red-600 text-zinc-300 hover:text-white transition-colors duration-200"
+                        onclick="alert('关闭应用程序 (在实际应用中会触发关闭逻辑)')">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+            </button>
+            </div>
+        </div>
+
+        <!-- 主工具栏 (Main Toolbar) -->
+        <div class="h-12 bg-zinc-800 flex items-center px-4 shadow-sm border-b border-zinc-700">
+            <button class="bg-zinc-700 hover:bg-zinc-600 text-zinc-200 font-medium py-2 px-4 rounded-md shadow-sm mr-2 text-sm">
+                新建
+            </button>
+            <button class="bg-zinc-700 hover:bg-zinc-600 text-zinc-200 font-medium py-2 px-4 rounded-md shadow-sm mr-2 text-sm">
+                打开
+            </button>
+            <button class="bg-zinc-700 hover:bg-zinc-600 text-zinc-200 font-medium py-2 px-4 rounded-md shadow-sm mr-4 text-sm">
+                导入
+            </button>
+
+            <!-- Playback Controls -->
+            <div class="flex items-center space-x-2 mr-4">
+                <button class="bg-zinc-700 hover:bg-zinc-600 text-zinc-200 p-2 rounded-md shadow-sm text-sm">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                </button>
+                <button class="bg-zinc-700 hover:bg-zinc-600 text-zinc-200 p-2 rounded-md shadow-sm text-sm">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7v6h4V7H8z" clip-rule="evenodd"></path></svg>
+                </button>
+            </div>
+
+            <!-- Tools -->
+            <div class="flex items-center space-x-2">
+                <button class="bg-blue-600 hover:bg-blue-500 text-white p-2 rounded-md shadow-sm text-sm">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.38-2.828-2.829z"></path></svg>
+                </button>
+                <button class="bg-zinc-700 hover:bg-zinc-600 text-zinc-200 p-2 rounded-md shadow-sm text-sm">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.38-2.828-2.829z" clip-rule="evenodd"></path></svg>
+                </button>
+                <button class="bg-zinc-700 hover:bg-zinc-600 text-zinc-200 p-2 rounded-md shadow-sm text-sm">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 005.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- 主内容区域 (Main Content Area - Resizable Panels) -->
+        <div class="flex flex-grow overflow-hidden">
+            <!-- 左侧面板容器 -->
+            <div id="left-panel-container" class="w-[250px] min-w-[180px] max-w-[400px] flex flex-col bg-zinc-800 border-r border-zinc-700">
+                <!-- 选项卡导航 -->
+                <div class="flex border-b border-zinc-700">
+                    <button id="tab-files" class="flex-1 py-2 text-sm font-medium border-r border-zinc-700 bg-zinc-700 hover:bg-zinc-600 rounded-tl-md">文件/项目</button>
+                    <button id="tab-media" class="flex-1 py-2 text-sm font-medium bg-zinc-800 hover:bg-zinc-700 rounded-tr-md">媒体/效果</button>
+                </div>
+                <!-- 面板内容 -->
+                <div id="left-panel-content" class="flex-grow overflow-hidden">
+                    <div id="content-files" class="p-2 h-full overflow-auto text-sm">
+                        <h3 class="font-semibold mb-2 text-zinc-300">项目文件</h3>
+                        <ul class="list-disc list-inside text-zinc-400">
+                            <li><span class="text-blue-400">视频_001.mp4</span></li>
+                            <li><span class="text-green-400">图像_背景.jpg</span></li>
+                            <li><span class="text-yellow-400">音频_背景乐.mp3</span></li>
+                            <li><span class="text-red-400">序列_主合成</span></li>
+                            <li><span class="text-purple-400">调整层_颜色校正</span></li>
+                        </ul>
+                        <h3 class="font-semibold mt-4 mb-2 text-zinc-300">文件夹</h3>
+                        <ul class="list-disc list-inside text-zinc-400">
+                            <li>视频素材</li>
+                            <li>图片素材</li>
+                            <li>音频素材</li>
+                        </ul>
+                    </div>
+                    <div id="content-media" class="p-2 h-full overflow-auto hidden text-sm">
+                        <h3 class="font-semibold mb-2 text-zinc-300">转场</h3>
+                        <ul class="list-disc list-inside text-zinc-400">
+                            <li>淡入淡出</li>
+                            <li>推拉</li>
+                            <li>擦除</li>
+                        </ul>
+                        <h3 class="font-semibold mt-4 mb-2 text-zinc-300">视频效果</h3>
+                        <ul class="list-disc list-inside text-zinc-400">
+                            <li>模糊</li>
+                            <li>锐化</li>
+                            <li>色彩校正</li>
+                        </ul>
+                        <h3 class="font-semibold mt-4 mb-2 text-zinc-300">图像滤镜</h3>
+                        <ul class="list-disc list-inside text-zinc-400">
+                            <li>黑白</li>
+                            <li>老照片</li>
+                            <li>卡通化</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 左侧面板调整器 -->
+            <div id="left-resizer" class="resizer resizer-vertical"></div>
+
+            <!-- 预览/画布区域 (Preview/Canvas Area) -->
+            <div class="flex-grow bg-zinc-700 flex items-center justify-center text-zinc-400 text-2xl border border-zinc-600 rounded-lg m-2 overflow-hidden">
+                <div class="w-full h-full flex items-center justify-center bg-black rounded-md">
+                    <span class="text-zinc-500">预览/画布区域 (实时显示)</span>
+                </div>
+            </div>
+
+            <!-- 右侧面板调整器 -->
+            <div id="right-resizer" class="resizer resizer-vertical"></div>
+
+            <!-- 右侧面板容器 -->
+            <div id="right-panel-container" class="w-[250px] min-w-[180px] max-w-[400px] flex flex-col bg-zinc-800 border-l border-zinc-700">
+                <!-- 选项卡导航 -->
+                <div class="flex border-b border-zinc-700">
+                    <button id="tab-properties" class="flex-1 py-2 text-sm font-medium border-r border-zinc-700 bg-zinc-700 hover:bg-zinc-600 rounded-tl-md">属性/检查器</button>
+                    <button id="tab-history" class="flex-1 py-2 text-sm font-medium bg-zinc-800 hover:bg-zinc-700 rounded-tr-md">历史记录</button>
+                </div>
+                <!-- 面板内容 -->
+                <div id="right-panel-content" class="flex-grow overflow-hidden">
+                    <div id="content-properties" class="p-2 h-full overflow-auto text-sm">
+                        <h3 class="font-semibold mb-2 text-zinc-300">选中对象属性</h3>
+                        <div class="mb-2">
+                            <label class="block text-zinc-400 text-xs mb-1">宽度:</label>
+                            <input type="number" value="1920" class="w-full p-1 bg-zinc-700 border border-zinc-600 rounded-sm text-zinc-200 text-xs">
+                        </div>
+                        <div class="mb-2">
+                            <label class="block text-zinc-400 text-xs mb-1">高度:</label>
+                            <input type="number" value="1080" class="w-full p-1 bg-zinc-700 border border-zinc-600 rounded-sm text-zinc-200 text-xs">
+                        </div>
+                        <div class="mb-2">
+                            <label class="block text-zinc-400 text-xs mb-1">透明度:</label>
+                            <input type="range" min="0" max="100" value="100" class="w-full h-1 bg-zinc-600 rounded-lg appearance-none cursor-pointer range-sm">
+                        </div>
+                        <div class="mb-2">
+                            <label class="block text-zinc-400 text-xs mb-1">混合模式:</label>
+                            <select class="w-full p-1 bg-zinc-700 border border-zinc-600 rounded-sm text-zinc-200 text-xs">
+                                <option>正常</option>
+                                <option>叠加</option>
+                                <option>屏幕</option>
+                            </select>
+                        </div>
+                        <h3 class="font-semibold mt-4 mb-2 text-zinc-300">颜色校正</h3>
+                        <div class="mb-2">
+                            <label class="block text-zinc-400 text-xs mb-1">亮度:</label>
+                            <input type="range" min="-100" max="100" value="0" class="w-full h-1 bg-zinc-600 rounded-lg appearance-none cursor-pointer range-sm">
+                        </div>
+                        <div class="mb-2">
+                            <label class="block text-zinc-400 text-xs mb-1">对比度:</label>
+                            <input type="range" min="-100" max="100" value="0" class="w-full h-1 bg-zinc-600 rounded-lg appearance-none cursor-pointer range-sm">
+                        </div>
+                    </div>
+                    <div id="content-history" class="p-2 h-full overflow-auto hidden text-sm">
+                        <h3 class="font-semibold mb-2 text-zinc-300">操作历史</h3>
+                        <ul class="list-disc list-inside text-zinc-400">
+                            <li>导入视频_001.mp4</li>
+                            <li>裁剪视频</li>
+                            <li>添加文本层</li>
+                            <li>调整文本颜色</li>
+                            <li>应用模糊滤镜</li>
+                            <li>调整亮度</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 时间轴调整器 (Timeline Resizer) -->
+        <div id="timeline-resizer" class="resizer resizer-horizontal"></div>
+
+        <!-- 时间轴/图层面板 (Timeline/Layers Panel) -->
+        <div id="timeline-panel" class="h-[200px] min-h-[100px] max-h-[400px] bg-zinc-800 border-t border-zinc-700 overflow-auto p-4">
+            <h3 class="font-semibold mb-2 text-zinc-300">时间轴/图层</h3>
+            <div class="flex items-center mb-2">
+                <span class="text-zinc-400 text-xs mr-2">00:00:00:00</span>
+                <div class="flex-grow h-2 bg-zinc-700 rounded-full relative">
+                    <div class="absolute h-full w-1/3 bg-blue-500 rounded-full"></div>
+                    <div class="absolute h-full w-1 bg-zinc-200 left-1/4 -ml-0.5"></div> <!-- Playhead -->
+                </div>
+                <span class="text-zinc-400 text-xs ml-2">00:00:30:00</span>
+            </div>
+            <!-- Dummy Tracks -->
+            <div class="flex flex-col space-y-1 text-sm">
+                <div class="bg-zinc-700 p-1 rounded-sm flex items-center">
+                    <span class="w-20 text-zinc-400">视频轨道 1</span>
+                    <div class="flex-grow h-6 bg-green-600 rounded-sm ml-2 flex items-center justify-center text-xs">视频剪辑 A</div>
+                </div>
+                <div class="bg-zinc-700 p-1 rounded-sm flex items-center">
+                    <span class="w-20 text-zinc-400">音频轨道 1</span>
+                    <div class="flex-grow h-6 bg-yellow-600 rounded-sm ml-2 flex items-center justify-center text-xs">背景音乐</div>
+                </div>
+                <div class="bg-zinc-700 p-1 rounded-sm flex items-center">
+                    <span class="w-20 text-zinc-400">文本轨道 1</span>
+                    <div class="flex-grow h-6 bg-blue-600 rounded-sm ml-2 flex items-center justify-center text-xs">标题</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 状态栏 (Status Bar) -->
+        <div class="h-8 bg-zinc-800 flex items-center px-4 text-sm text-zinc-500 border-t border-zinc-700">
+            <span>就绪</span>
+            <span class="ml-auto">分辨率: 1920x1080 | 帧率: 30fps</span>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript for panel resizing
+        function setupResizer(resizerId, panelId, isVertical) {
+            const resizer = document.getElementById(resizerId);
+            const panel = document.getElementById(panelId);
+            let isResizing = false;
+
+            resizer.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                document.body.style.cursor = isVertical ? 'ew-resize' : 'ns-resize';
+                document.body.style.userSelect = 'none'; // Prevent text selection during resize
+                document.body.style.pointerEvents = 'none'; // Prevent interaction with other elements
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+
+                if (isVertical) {
+                    // Vertical resizer (left/right panels)
+                    const containerRect = panel.parentElement.getBoundingClientRect();
+                    let newWidth;
+                    if (resizerId === 'left-resizer') {
+                        newWidth = e.clientX - containerRect.left;
+                    } else { // right-resizer
+                        newWidth = containerRect.right - e.clientX;
+                    }
+
+                    // Apply min/max width constraints
+                    const minWidth = parseInt(window.getComputedStyle(panel).minWidth);
+                    const maxWidth = parseInt(window.getComputedStyle(panel).maxWidth);
+
+                    if (newWidth >= minWidth && newWidth <= maxWidth) {
+                        panel.style.width = `${newWidth}px`;
+                    } else if (newWidth < minWidth) {
+                        panel.style.width = `${minWidth}px`;
+                    } else if (newWidth > maxWidth) {
+                        panel.style.width = `${maxWidth}px`;
+                    }
+                } else {
+                    // Horizontal resizer (timeline panel)
+                    const containerHeight = panel.parentElement.clientHeight;
+                    const newHeight = containerHeight - (e.clientY - panel.parentElement.getBoundingClientRect().top);
+
+                    // Apply min/max height constraints
+                    const minHeight = parseInt(window.getComputedStyle(panel).minHeight);
+                    const maxHeight = parseInt(window.getComputedStyle(panel).maxHeight);
+
+                    if (newHeight >= minHeight && newHeight <= maxHeight) {
+                        panel.style.height = `${newHeight}px`;
+                    } else if (newHeight < minHeight) {
+                        panel.style.height = `${minHeight}px`;
+                    } else if (newHeight > maxHeight) {
+                        panel.style.height = `${maxHeight}px`;
+                    }
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                isResizing = false;
+                document.body.style.cursor = 'default';
+                document.body.style.userSelect = '';
+                document.body.style.pointerEvents = '';
+            });
+        }
+
+        // Setup resizers
+        setupResizer('left-resizer', 'left-panel-container', true);
+        setupResizer('right-resizer', 'right-panel-container', true);
+        setupResizer('timeline-resizer', 'timeline-panel', false);
+
+        // JavaScript for tab switching
+        function setupTabs(tabButtons, contentPanels) {
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.id.replace('tab-', 'content-');
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('bg-zinc-700', 'hover:bg-zinc-600');
+                        btn.classList.add('bg-zinc-800', 'hover:bg-zinc-700');
+                    });
+                    contentPanels.forEach(panel => panel.classList.add('hidden'));
+
+                    button.classList.remove('bg-zinc-800', 'hover:bg-zinc-700');
+                    button.classList.add('bg-zinc-700', 'hover:bg-zinc-600');
+                    document.getElementById(targetId).classList.remove('hidden');
+                });
+            });
+        }
+
+        // Left Panel Tabs
+        const leftTabButtons = [
+            document.getElementById('tab-files'),
+            document.getElementById('tab-media')
+        ];
+        const leftContentPanels = [
+            document.getElementById('content-files'),
+            document.getElementById('content-media')
+        ];
+        setupTabs(leftTabButtons, leftContentPanels);
+
+        // Right Panel Tabs
+        const rightTabButtons = [
+            document.getElementById('tab-properties'),
+            document.getElementById('tab-history')
+        ];
+        const rightContentPanels = [
+            document.getElementById('content-properties'),
+            document.getElementById('content-history')
+        ];
+        setupTabs(rightTabButtons, rightContentPanels);
+
+        // Initialize default active tabs
+        document.getElementById('tab-files').click();
+        document.getElementById('tab-properties').click();
+
+        // Maximize/Restore button logic
+        let isMaximized = false;
+        function toggleMaximizeRestore() {
+            const maximizeIcon = document.getElementById('maximize-icon');
+            const restoreIcon = document.getElementById('restore-icon');
+            
+            if (isMaximized) {
+                // Currently maximized, switch to restore
+                maximizeIcon.classList.remove('hidden');
+                restoreIcon.classList.add('hidden');
+                alert('还原应用程序 (在实际应用中会触发窗口还原逻辑)');
+            } else {
+                // Currently restored, switch to maximize
+                maximizeIcon.classList.add('hidden');
+                restoreIcon.classList.remove('hidden');
+                alert('最大化应用程序 (在实际应用中会触发窗口最大化逻辑)');
+            }
+            isMaximized = !isMaximized;
+        }
+
+    </script>
+</body>
+</html>

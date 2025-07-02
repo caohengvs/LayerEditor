@@ -5,16 +5,26 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(Windows) 启动",
+            "name": "(debug) LayerEditor",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "project1d",
+            "program": "LayerEditord",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/bin",
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+          {
+            "name": "(release) LayerEditor",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "LayerEditor",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/bin",
             "environment": [],
             "console": "integratedTerminal"
         }
-     
     ]
 }

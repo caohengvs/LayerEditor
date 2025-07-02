@@ -9,21 +9,15 @@
 A thread-safe, asynchronous logging library built as a wrapper around spdlog.
 
 ## ✨ Features
-
-- 🔄 Asynchronous logging support
-- 🔒 Thread-safe singleton design
-- 📚 Multiple logger instances support
-- ⚙️ Default logger configuration
-- 📍 Source location tracking
-- 🎨 Both formatted and stream-style logging
-- 🔌 DLL export support for Windows
+待补充
 
 ## 📋 Dependencies
 - spdlog v1.15.3 or later
 - vcpkg package manager
 - CMake 3.20.0 or later
 - opencv 4.5.1 or later
-- C++17 compiler
+- C++17 compiler(msvc)
+- Qt5.12.12
 
 ## 🚀 Quick Start
 
@@ -42,27 +36,6 @@ cmake --build build --config Release
 ```
 
 ### Basic Usage
-
-```cpp
-#include "logger/ILogger.hpp"
-
-int main() {
-    // Get logger instance
-    auto& logger = CHUtils::ILogger::s_GetInstance();
-    
-    // Create and set default logger
-    logger.addLogger("main_logger", "logs/main.log");
-    logger.setDefaultLogger("main_logger");
-    
-    // Log messages
-    logger.info({"main.cpp", __LINE__, __FUNCTION__}, "Hello, World!");
-    logger.info({"main.cpp", __LINE__, __FUNCTION__}, "Value is {}", 42);
-    
-    // Clean up
-    CHUtils::ILogger::s_DestroyInstance();
-    return 0;
-}
-```
 
 ## 📁 Project Structure
 
@@ -89,28 +62,15 @@ CppTools/
 
 ## ⚙️ Configuration
 
-The library supports both synchronous and asynchronous logging modes:
-
-### Default Settings
-- ✅ Async mode enabled
-- 📊 Thread pool size: 8192
-- 🧵 Worker threads: 1
-- 🐛 Debug level logging enabled
-- 🔄 Auto-flush on debug level
-- ⏱️ 500ms flush interval
-
 ### CMake Options
 
 ```cmake
-set(CMAKE_TOOLCHAIN_FILE "D:/vcpkg/scripts/buildsystems/vcpkg.cmake")
+set(CMAKE_TOOLCHAIN_FILE "your vcpkg installed path/vcpkg.cmake")
 set(VCPKG_TARGET_TRIPLET "x64-windows")
 ```
 
 ## 📈 Performance
 
-- Asynchronous logging for minimal impact on application performance
-- Thread-safe operations without locks in the fast path
-- Efficient memory usage with thread pool
 
 ## 🤝 Contributing
 

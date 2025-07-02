@@ -3,6 +3,7 @@
     "cmake.configureArgs": [
         // "-DCMAKE_TOOLCHAIN_FILE=D:/vcpkg/scripts/buildsystems/vcpkg.cmake",
     ],
+    "files.encoding": "utf8",
     "files.associations": {
         "algorithm": "cpp",
         "array": "cpp",
@@ -68,6 +69,12 @@
         "xtr1common": "cpp",
         "xtree": "cpp",
         "xutility": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "qvboxlayout": "cpp",
+        "qwidget": "cpp",
+        "qmainwindow": "cpp",
+        "qmouseevent": "cpp",
+        "complex": "cpp",
+        "qpushbutton": "cpp"
     }
 }

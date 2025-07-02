@@ -3,7 +3,8 @@
         {
             "name": "Win64",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "C:/Qt/Qt5.12.12/5.12.12/msvc2017_64/include/QtWidgets"
             ],
             "compilerPath": "cl.exe",
             "cStandard": "c17",

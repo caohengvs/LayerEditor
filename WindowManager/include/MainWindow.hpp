@@ -1,9 +1,14 @@
 #pragma once
+#include "CommonDef/ExportDef.h"
 #include <QMainWindow>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QWidget> 
-#include "CommonDef/ExportDef.h"
+#include <array>
+
+class CustomTitleBar;
+class CustomView; 
+class CustomScene;
 
 class LIB_API MainWindow : public QMainWindow
 {
@@ -13,9 +18,13 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-private slots:
-    void onUpdate(); 
 
 private:
-    std::unique_ptr<QPushButton> m_btnUpdate;
+    void init();
+
+private:
+    QPushButton* m_btnUpdate;
+    CustomTitleBar* m_customTitleBar; 
+    std::pair<CustomScene*, CustomView*> m_mainSceneAndView;
+    std::pair<CustomScene*, std::array<CustomView*, 8>> m_previewSceneAndView;
 };

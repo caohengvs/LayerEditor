@@ -10,7 +10,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-project(project1 VERSION 0.1.0 LANGUAGES C CXX)
+project(LayerEditor VERSION 0.1.0 LANGUAGES C CXX)
 find_package(Qt5 COMPONENTS Widgets Core Gui REQUIRED)
 
 include_directories(
@@ -21,7 +21,7 @@ include_directories(
 
 add_subdirectory(Logger)
 add_subdirectory(WindowManager)
-add_executable(project1 main.cpp)
+add_executable(${PROJECT_NAME} main.cpp)
 
 target_link_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/Logger/lib

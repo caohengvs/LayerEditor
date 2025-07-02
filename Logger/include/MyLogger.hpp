@@ -36,6 +36,7 @@ public:
 
     class LogStream;
 
+    LogStream log(LogLevel eLevel,const char* file, int line, const char* func);
     LogStream trace(const char* file, int line, const char* func);
     LogStream debug(const char* file, int line, const char* func);
     LogStream info(const char* file, int line, const char* func);

@@ -9,10 +9,13 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(Qt5 COMPONENTS Widgets Core Gui REQUIRED)
-file(GLOB SOURCES "src/*.cpp" "*.cpp" "include/*.hpp")
+file(GLOB_RECURSE SOURCES "*.hpp" "*.cpp")
+file(GLOB_RECURSE RESOURCES "*.qrc")
+message(${RESOURCES})
 
 add_library(${PROJECT_NAME} SHARED
     ${SOURCES}
+    ${RESOURCES}
 )
 
 target_link_directories(${PROJECT_NAME} PRIVATE
@@ -25,10 +28,14 @@ target_link_libraries(${PROJECT_NAME}
 ) 
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/CommonDef/include>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/Logger/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/CustomTitleBar/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/CustomGraphics/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/CustomMenuBar/include>
     $<INSTALL_INTERFACE:include>
 )
+
 
 include(${CMAKE_ROOT_DIR}/ProjectConfig.cmake)

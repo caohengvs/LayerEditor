@@ -1,0 +1,27 @@
+cmake_minimum_required(VERSION 3.20.0)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+project(project1 VERSION 0.1.0 LANGUAGES C CXX)
+add_executable(project1 main.cpp)
+find_package(Qt5 COMPONENTS Widgets Core Gui REQUIRED)
+
+target_link_libraries(${PROJECT_NAME} 
+    PRIVATE "$<IF:$<CONFIG:Debug>,Loggerd,Logger>"
+    PRIVATE "$<IF:$<CONFIG:Debug>,WindowManagerd,WindowManager>"
+    PRIVATE Qt5::Widgets
+)
+
+set(OUTPUT_DIR ${CMAKE_SOURCE_DIR})
+
+set_target_properties(${PROJECT_NAME} PROPERTIES 
+    VS_DEBUGGER_WORKING_DIRECTORY ${OUTPUT_DIR}
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG ${OUTPUT_DIR}/bin
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUTPUT_DIR}/bin
+    OUTPUT_NAME "$<IF:$<CONFIG:Debug>,${PROJECT_NAME}d,${PROJECT_NAME}>"
+)
+
