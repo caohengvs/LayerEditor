@@ -57,7 +57,7 @@ LayerEditor/
 ├── main.cpp          # 示例或主程序入口
 ├── CMakeLists.txt    # 项目主CMake配置
 └── README.md         # 项目说明文档
-``
+```
 
 ## ⚙️ Configuration
 

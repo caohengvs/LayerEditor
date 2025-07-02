@@ -1,5 +1,5 @@
 #include "MyLogger.hpp"
-
+#include <spdlog/async.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
@@ -43,42 +43,93 @@ MyLogger::~MyLogger() = default;
 
 MyLogger& MyLogger::getInstance()
 {
-    static MyLogger instance;
-    return instance;
+    if (m_pInstance)
+        return *m_pInstance;
+
+    std::lock_guard lock(m_mtxCreate);
+    m_pInstance = new MyLogger;
+    return *m_pInstance;
+}
+
+void MyLogger::deleteInstance()
+{
+    if (!m_pInstance)
+        return;
+
+    std::lock_guard lock(m_mtxCreate);
+    delete m_pInstance;
+    m_pInstance = nullptr;
 }
 
 void MyLogger::init(const std::string& loggerName, MyLogger::LogLevel level, bool enableConsole,
-                    const std::string& filePath, size_t maxFileSize, size_t maxFiles)
+                    const std::string& filePath, size_t maxFileSize, size_t maxFiles, bool isSync)
 {
-    if (!pimpl_->logger_)
-    {
-        std::vector<spdlog::sink_ptr> sinks;
-        if (enableConsole)
-        {
-            sinks.push_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
-        }
-        if (!filePath.empty())
-        {
-            sinks.push_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(filePath, maxFileSize, maxFiles));
-        }
+    if (pimpl_->logger_)
+        return;
 
-        if (sinks.empty())
-        {
-            pimpl_->logger_ = spdlog::stdout_color_mt(loggerName);
-        }
-        else if (sinks.size() == 1)
-        {
-            pimpl_->logger_ = std::make_shared<spdlog::logger>(loggerName, sinks[0]);
-        }
-        else
-        {
-            pimpl_->logger_ = std::make_shared<spdlog::logger>(loggerName, begin(sinks), end(sinks));
-        }
-        pimpl_->logger_->set_level(MyLoggerImpl::mapLogLevel(level));
-        pimpl_->logger_->set_pattern("[%Y-%m-%d %H:%M:%S.%e][%^%l%$][TID:%t][%s:%#:%!] %v");
-        spdlog::set_default_logger(pimpl_->logger_);
-        pimpl_->logger_->flush_on(MyLoggerImpl::mapLogLevel(level));
+    std::vector<spdlog::sink_ptr> sinks;
+    if (enableConsole)
+    {
+        sinks.push_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
     }
+    if (!filePath.empty())
+    {
+        sinks.push_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(filePath, maxFileSize, maxFiles));
+    }
+
+    if (isSync)
+        initSync(sinks, loggerName, level);
+    else
+        initAsync(sinks, loggerName, level);
+}
+
+void MyLogger::initSync(std::vector<spdlog::sink_ptr> sinks, const std::string& loggerName, LogLevel level)
+{
+    if (sinks.empty())
+    {
+        pimpl_->logger_ = spdlog::stdout_color_mt(loggerName);
+        return;
+    }
+
+    if (sinks.size() == 1)
+    {
+        pimpl_->logger_ = std::make_shared<spdlog::logger>(loggerName, sinks[0]);
+    }
+    else
+    {
+        pimpl_->logger_ = std::make_shared<spdlog::logger>(loggerName, begin(sinks), end(sinks));
+    }
+    pimpl_->logger_->set_level(MyLoggerImpl::mapLogLevel(level));
+    pimpl_->logger_->set_pattern("[%Y-%m-%d %H:%M:%S.%e][%^%l%$][TID:%t][%s:%#:%!] %v");
+    spdlog::set_default_logger(pimpl_->logger_);
+    pimpl_->logger_->flush_on(MyLoggerImpl::mapLogLevel(level));
+}
+
+void MyLogger::initAsync(std::vector<spdlog::sink_ptr> sinks, const std::string& loggerName, LogLevel level)
+{
+    if (sinks.empty())
+    {
+        pimpl_->logger_ = spdlog::stdout_color_mt(loggerName);
+        return;
+    }
+
+    spdlog::init_thread_pool(8192, 1);
+    if (sinks.size() == 1)
+    {
+        pimpl_->logger_ = std::make_shared<spdlog::async_logger>(loggerName, sinks[0], spdlog::thread_pool(),
+                                                                 spdlog::async_overflow_policy::block);
+    }
+    else
+    {
+        pimpl_->logger_ = std::make_shared<spdlog::async_logger>(
+            loggerName, begin(sinks), end(sinks), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
+    }
+
+    spdlog::flush_every(std::chrono::milliseconds(500));
+    pimpl_->logger_->set_level(MyLoggerImpl::mapLogLevel(level));
+    pimpl_->logger_->set_pattern("[%Y-%m-%d %H:%M:%S.%e][%^%l%$][TID:%t][%s:%#:%!] %v");
+    spdlog::set_default_logger(pimpl_->logger_);
+    pimpl_->logger_->flush_on(MyLoggerImpl::mapLogLevel(level));
 }
 
 struct MyLogger::LogStreamImpl

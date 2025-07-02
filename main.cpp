@@ -6,11 +6,12 @@
 
 int main(int argc, char** argv)
 {
-    INIT_MY_LOGGER("MyApplication", MyLogger::DEBUG_L, true, "logs/app.log");
+    auto & loggger = MyLogger::getInstance();
+    loggger.init("MyApplication", MyLogger::DEBUG_L, true, "logs/app.log",true);
 
     QApplication app(argc, argv);
 
-    app.setApplicationName("Layer Editor");
+    app.setApplicationName("LayerEditor");
     QIcon appIcon(":/icons/app.svg");
     app.setWindowIcon(appIcon);
     qInstallMessageHandler(
@@ -54,6 +55,7 @@ int main(int argc, char** argv)
                      {
                          qInfo() << "Application is about to quit.";
                          delete mainWindow;
+                         MyLogger::deleteInstance();
                      });
 
     return app.exec();

@@ -75,6 +75,17 @@
         "qmainwindow": "cpp",
         "qmouseevent": "cpp",
         "complex": "cpp",
-        "qpushbutton": "cpp"
+        "qpushbutton": "cpp",
+        "bitset": "cpp",
+        "deque": "cpp",
+        "filesystem": "cpp",
+        "fstream": "cpp",
+        "future": "cpp",
+        "iomanip": "cpp",
+        "numeric": "cpp",
+        "queue": "cpp",
+        "set": "cpp",
+        "xthread": "cpp",
+        "variant": "cpp"
     }
 }
