@@ -21,6 +21,7 @@ include_directories(
 
 add_subdirectory(Logger)
 add_subdirectory(WindowManager)
+add_subdirectory(ImageProcessor)
 add_executable(${PROJECT_NAME} main.cpp)
 
 target_link_directories(${PROJECT_NAME} PRIVATE

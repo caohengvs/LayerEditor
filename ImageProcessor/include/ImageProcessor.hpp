@@ -4,8 +4,13 @@
 class LIB_API ImageProcessor
 {
 public:
-    ImageProcessor() = default;
-    ~ImageProcessor() = default;
-    int processImage(const std::string& imagePath);
-    void saveImage(const std::string& outputPath);
+    explicit ImageProcessor(const std::string& path);
+    ~ImageProcessor();
+
+public:
+    int processImage(const std::string& path);
+    bool processImage();
+
+private:
+    std::string m_strImgPath;
 };

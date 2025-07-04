@@ -15,11 +15,22 @@
             "environment": [],
             "console": "integratedTerminal"
         },
-          {
+        {
             "name": "(release) LayerEditor",
             "type": "cppvsdbg",
             "request": "launch",
             "program": "LayerEditor",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/bin",
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "(test) ImageProcessor",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "test_imageProcessord",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/bin",
