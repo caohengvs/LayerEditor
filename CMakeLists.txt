@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.20.0)
+cmake_policy(SET CMP0074 NEW)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_GENERATOR_PLATFORM x64)
@@ -11,6 +12,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 project(LayerEditor VERSION 0.1.0 LANGUAGES C CXX)
+set(Qt5_ROOT "D:/Qt/5.12.12/msvc2017_64")
 find_package(Qt5 COMPONENTS Widgets Core Gui REQUIRED)
 
 include_directories(
@@ -40,7 +42,24 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/WindowManager/include
 )
 
+
 set(OUTPUT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
+if(WIN32)
+    find_program(WINDEPLOYQT_EXECUTABLE NAMES windeployqt PATHS ${Qt5_ROOT}/bin)
+
+    if(WINDEPLOYQT_EXECUTABLE)
+        message(STATUS "找到 windeployqt: ${WINDEPLOYQT_EXECUTABLE}")
+        add_custom_command(
+            TARGET ${PROJECT_NAME}# 关联到你的可执行文件目标
+            POST_BUILD                    # 在目标构建完成后运行
+            COMMAND "${WINDEPLOYQT_EXECUTABLE}"
+                    ${OUTPUT_DIR}/bin # 可选：如果你的项目有 QML 文件，告诉 windeployqt 扫描源目录
+        )
+    else()
+        message(WARNING "未找到 windeployqt。部署可能需要手动步骤。")
+    endif()
+endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES 
     VS_DEBUGGER_WORKING_DIRECTORY ${OUTPUT_DIR}

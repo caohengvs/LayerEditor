@@ -5,7 +5,6 @@ project(ImageProcessor)
 
 file(GLOB SOURCES "src/*.cpp" "include/*.hpp")
 
-set(OpenCV_DIR ${CMAKE_SOURCE_DIR}/3rdParty/opencv)
 find_package(OpenCV REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED

@@ -13,7 +13,7 @@
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/bin",
             "environment": [],
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
         },
         {
             "name": "(release) LayerEditor",
@@ -24,7 +24,7 @@
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/bin",
             "environment": [],
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
         },
         {
             "name": "(test) ImageProcessor",
@@ -35,7 +35,7 @@
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/bin",
             "environment": [],
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
         }
     ]
 }
