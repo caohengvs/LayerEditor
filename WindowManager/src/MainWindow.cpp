@@ -25,7 +25,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::init()
 {
-
     QScreen* screen = QGuiApplication::primaryScreen();
     if (!screen)
         return;
@@ -37,7 +36,7 @@ void MainWindow::init()
     QRect screenGeometry = screen->availableGeometry();
     int x = (screenGeometry.width() - nW) / 2;
     int y = (screenGeometry.height() - nH) / 2;
-    setGeometry(x, y, nW,  nH);
+    setGeometry(x, y, nW, nH);
     setStyleSheet("background-color: #3f3f46");
 
     QWidget* centralWidget = new QWidget(this);
@@ -92,5 +91,7 @@ void MainWindow::init()
     setCentralWidget(centralWidget);
 
     connect(m_customFileList, &CustomFileListWidget::fileDoubleClicked, this,
-            [](const auto& filePath) { qDebug() << "current selected file:" << filePath; });
+            [&scene](const auto& filePath) { 
+                scene->loadImage(filePath);
+            });
 }

@@ -4,21 +4,18 @@
 CustomScene::CustomScene(QObject* parent)
     : QGraphicsScene(parent)
 {
-    qDebug() << "CustomScene created with default constructor";
     initDefaultText("Welcome to Custom Scene!");
 }
 
 CustomScene::CustomScene(const QRectF& sceneRect, QObject* parent)
     : QGraphicsScene(sceneRect, parent)
 {
-    qDebug() << "CustomScene created with QRectF constructor";
     initDefaultText("Welcome to Custom Scene!");
 }
 
 CustomScene::CustomScene(qreal x, qreal y, qreal width, qreal height, QObject* parent)
     : QGraphicsScene(x, y, width, height, parent)
 {
-    qDebug() << "CustomScene created with x, y, width, height constructor";
     initDefaultText("Welcome to Custom Scene!");
 }
 
@@ -40,6 +37,21 @@ void CustomScene::clearDefaultText()
     removeItem(m_defaultTextItem);
     delete m_defaultTextItem;
     m_defaultTextItem = nullptr;
+}
+
+bool CustomScene::loadImage(const QString& filePath)
+{
+    auto pItem = new QGraphicsPixmapItem(QPixmap(filePath));
+    if (pItem->pixmap().isNull())
+    {
+        qDebug() << "Failed to load image from" << filePath;
+        delete pItem;  
+        return false;
+    }
+
+    pItem->setTransformationMode(Qt::SmoothTransformation);
+    addItem(pItem);
+    return true;
 }
 
 void CustomScene::initDefaultText(const QString& text)

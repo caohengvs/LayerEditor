@@ -4,7 +4,6 @@
 #include <QScreen>
 #include <QStyle>
 
-
 CustomTitleBar::CustomTitleBar(QMainWindow* mainWindow, QWidget* parent)
     : QWidget(parent)
     , m_parentWindow(mainWindow)

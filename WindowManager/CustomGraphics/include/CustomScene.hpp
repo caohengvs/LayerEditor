@@ -14,6 +14,7 @@ public:
 public:
     void setDefaultText(const QString& text);
     void clearDefaultText();
+    bool loadImage(const QString& filePath);
 
 private:
     void initDefaultText(const QString& text);
