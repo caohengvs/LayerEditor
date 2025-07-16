@@ -1,13 +1,13 @@
+#pragma once
 /**
- * @file CustomTitleBar.hpp
- * @brief 自定义标题栏控件
- * @author Curtis
- * @date 2025-07-16 13:34:49
- * @version 1.0
- * @email caohengvs888@gmail.com
+ * @file: CustomTitleBar.hpp
+ * @brief: 自定义标题栏类，用于替代默认的窗口标题栏
+ * @author: Curtis
+ * @date: 2025-07-16 14:14:20
+ * @version: 1.0
+ * @email: caohengvs888@gmail.com
  */
 
-#pragma once
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMainWindow>

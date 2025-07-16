@@ -1,4 +1,3 @@
-// CustomFileListWidget.h
 #pragma once
 #include <QDesktopServices>  // For opening files
 #include <QDir>

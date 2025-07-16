@@ -1,14 +1,13 @@
-
+#pragma once
 /**
- * @file CustomView.hpp
- * @brief Custom graphics view class for the WindowManager project.
- * @author Curtis
- * @email caohengvs888@gmail.com
- * @date 2025-07-01 16:19:20
- * @version 1.0
+ * @file: CustomView.hpp
+ * @brief: 自定义的QGraphicsView类，用于扩展QGraphicsView的功能
+ * @author: Curtis
+ * @date: 2025-07-16 14:13:32
+ * @version: 1.0
+ * @email: caohengvs888@gmail.com
  */
 
-#pragma once
 #include <QGraphicsView>
 #include <QLabel>
 class CustomView final : public QGraphicsView

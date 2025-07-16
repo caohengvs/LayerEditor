@@ -7,10 +7,6 @@ public:
     explicit ImageProcessor(const std::string& path);
     ~ImageProcessor();
 
-public:
-    int processImage(const std::string& path);
-    bool processImage();
-
 private:
-    std::string m_strImgPath;
+    std::string m_strImgPath; // 默认路径
 };
