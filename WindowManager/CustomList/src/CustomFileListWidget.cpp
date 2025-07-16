@@ -19,31 +19,8 @@ CustomFileListWidget::CustomFileListWidget(QWidget* parent)
     treeView->hideColumn(2);
     treeView->hideColumn(3);
     treeView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-    treeView->setStyleSheet(
-        "QTreeView {"
-        "   border: none;"                   // Removes the border of the QTreeView widget
-        "   background-color: transparent;"  // Optional: make the background transparent
-        "   color: white;"                   // Sets default text color for items to white
-        "}");
 
     pathLineEdit = new QLineEdit(this);
-    pathLineEdit->setStyleSheet(
-        "QLineEdit {"
-        "   border: none;"                   // Removes the border
-        "   color: white;"                   // Sets the text color to white
-        "   background-color: transparent;"  // Optional: Make background transparent if it needs to blend
-        "}");
-
-    auto header = treeView->header();
-    if (header)
-    {  // Ensure the header exists before styling
-        header->setStyleSheet(
-            "QHeaderView::section {"
-            "   background-color: transparent;"  // Makes the header background transparent
-            "   border: none;"                   // Removes border from header sections
-            "   color: white;"                   // Sets text color for header text to white
-            "}");
-    }
 
     connect(pathLineEdit, &QLineEdit::returnPressed, this, &CustomFileListWidget::on_pathLineEdit_returnPressed);
     connect(treeView, &QTreeView::doubleClicked, this, &CustomFileListWidget::on_treeView_doubleClicked);

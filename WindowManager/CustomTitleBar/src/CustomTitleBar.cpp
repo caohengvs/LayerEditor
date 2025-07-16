@@ -4,7 +4,7 @@
 #include <QScreen>
 #include <QStyle>
 #include <QTime>
-#include <QTimer> 
+#include <QTimer>
 
 CustomTitleBar::CustomTitleBar(QMainWindow* mainWindow, QWidget* parent)
     : QWidget(parent)
@@ -12,13 +12,11 @@ CustomTitleBar::CustomTitleBar(QMainWindow* mainWindow, QWidget* parent)
 {
     setFixedHeight(30);
     setAttribute(Qt::WA_StyledBackground, true);
-    setStyleSheet("background-color: #333333;");
 
     m_closeButton = new QPushButton();
     QLabel* iconLabel = new QLabel(this);
-    QLabel* timeLabel = new QLabel(this);
-    timeLabel->setText(QTime::currentTime().toString("hh:mm:ss"));
-    timeLabel->setStyleSheet("color: white; font-size: 14px;");
+    QLabel* titleLabel = new QLabel(QApplication::applicationName(), this);
+    QLabel* timeLabel = new QLabel(QTime::currentTime().toString("hh:mm:ss"), this);
     QPixmap pixmap(":/icons/app.svg");
     iconLabel->setPixmap(pixmap.scaled(30, 30, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     iconLabel->setAlignment(Qt::AlignCenter);
@@ -30,15 +28,10 @@ CustomTitleBar::CustomTitleBar(QMainWindow* mainWindow, QWidget* parent)
         btn->setIcon(tmpIcon);
         btn->setIconSize(QSize(w * 2 / 3, h * 2 / 3));
         btn->setFlat(true);
-        btn->setStyleSheet(
-            "QPushButton { border: none; background-color: transparent;}"
-            "QPushButton:hover { background-color: #555555; }"
-            "QPushButton#closeButton:hover { background-color: red; }");
     };
 
     setupButton(m_closeButton, ":/icons/close.svg");
     m_closeButton->setObjectName("closeButton");
-
     connect(m_closeButton, &QPushButton::clicked, this, &CustomTitleBar::onCloseClicked);
 
     QHBoxLayout* layout = new QHBoxLayout(this);
@@ -46,6 +39,7 @@ CustomTitleBar::CustomTitleBar(QMainWindow* mainWindow, QWidget* parent)
     layout->setSpacing(0);
 
     layout->addWidget(iconLabel);
+    layout->addWidget(titleLabel);
     layout->addStretch();
 
     layout->addWidget(timeLabel);
@@ -56,10 +50,11 @@ CustomTitleBar::CustomTitleBar(QMainWindow* mainWindow, QWidget* parent)
     setLayout(layout);
 
     m_timer = new QTimer(this);
-    connect(m_timer, &QTimer::timeout, this, [timeLabel]() {
-        timeLabel->setText(QTime::currentTime().toString("hh:mm:ss"));
-    });
-    m_timer->start(1000);  
+    connect(m_timer, &QTimer::timeout, this,
+            [timeLabel]() { timeLabel->setText(QTime::currentTime().toString("hh:mm:ss")); });
+    m_timer->start(1000);
+
+    setStyleSheet(styleSheet() + "QPushButton#closeButton:hover { background-color: red; }");
 }
 
 CustomTitleBar::~CustomTitleBar()

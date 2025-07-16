@@ -20,5 +20,8 @@ public:
     ~CustomView() override;
 
 private:
+    void wheelEvent(QWheelEvent* event) override;
+
+private:
     void init();
 };

@@ -1,0 +1,37 @@
+/* dark_theme.qss */
+QLabel {
+    color: white;
+    font-size: 14px;
+}
+
+QWidget {
+    background-color: #333333;
+    border: none;
+}
+
+QPushButton {
+    border: none;
+    background-color: transparent; 
+}
+
+QPushButton:hover {
+    background-color: #555555; 
+}
+
+QTreeView {
+    border: none;           
+    background-color: transparent; 
+    color: white;         
+}
+
+QLineEdit {
+    border: none;           
+    color: white;           
+    background-color: transparent; 
+}
+
+QHeaderView::section {
+    background-color: transparent;
+    border: none;          
+    color: white;           
+}
