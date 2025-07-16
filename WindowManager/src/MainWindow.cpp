@@ -65,7 +65,7 @@ void MainWindow::init()
     previewLayout->setContentsMargins(0, 0, 0, 0);
     previewLayout->setSpacing(0);
 
-    scene->setDefaultText("画布区域");
+    // scene->setDefaultText("画布区域");
     auto rowCount = mainLayout->rowCount();
     rowCount = mainLayout->rowCount();
     mainLayout->addWidget(m_customTitleBar, rowCount, 0, 1, 2);

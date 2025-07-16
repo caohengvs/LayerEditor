@@ -20,5 +20,5 @@ private:
     void initDefaultText(const QString& text);
 
 private:
-    QGraphicsTextItem* m_defaultTextItem = nullptr;  // Example member variable for demonstration
+    QGraphicsTextItem* m_defaultTextItem = nullptr; 
 };

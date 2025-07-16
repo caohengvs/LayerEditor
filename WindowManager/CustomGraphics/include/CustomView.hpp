@@ -1,7 +1,7 @@
 #pragma once
 /**
  * @file: CustomView.hpp
- * @brief: 自定义的QGraphicsView类，用于扩展QGraphicsView的功能
+ * @brief: QGraphicsView, a custom view for displaying graphics scenes
  * @author: Curtis
  * @date: 2025-07-16 14:13:32
  * @version: 1.0

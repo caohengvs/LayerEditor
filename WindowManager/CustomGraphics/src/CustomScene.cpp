@@ -4,19 +4,16 @@
 CustomScene::CustomScene(QObject* parent)
     : QGraphicsScene(parent)
 {
-    initDefaultText("Welcome to Custom Scene!");
 }
 
 CustomScene::CustomScene(const QRectF& sceneRect, QObject* parent)
     : QGraphicsScene(sceneRect, parent)
 {
-    initDefaultText("Welcome to Custom Scene!");
 }
 
 CustomScene::CustomScene(qreal x, qreal y, qreal width, qreal height, QObject* parent)
     : QGraphicsScene(x, y, width, height, parent)
 {
-    initDefaultText("Welcome to Custom Scene!");
 }
 
 void CustomScene::setDefaultText(const QString& text)
