@@ -36,4 +36,5 @@ private:
 
     QPoint m_dragPosition;
     bool m_isDragging = false;
+    QTimer* m_timer;  
 };
