@@ -7,7 +7,7 @@
 int main(int argc, char** argv)
 {
     auto& loggger = Logger::getInstance();
-    loggger.init("MyApplication", Logger::DEBUG_L, true, true, "logs/app.log");
+    loggger.init("MyApplication", Logger::DEBUG_L, true, false, "logs/app.log");
 
     QApplication app(argc, argv);
 

@@ -34,6 +34,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/CustomTitleBar/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/CustomGraphics/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/CustomMenuBar/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/CustomList/include>
     $<INSTALL_INTERFACE:include>
 )
 
