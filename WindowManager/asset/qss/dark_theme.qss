@@ -1,12 +1,14 @@
 /* dark_theme.qss */
 QLabel {
     color: white;
-    font-size: 14px;
+    font-weight: bold;
 }
 
 QWidget {
     background-color: #333333;
     border: none;
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif; 
+    font-size: 14px;
 }
 
 QPushButton {
