@@ -4,5 +4,11 @@
         // "-DCMAKE_TOOLCHAIN_FILE=D:/vcpkg/scripts/buildsystems/vcpkg.cmake",
     ],
     "files.encoding": "utf8",
-    "files.autoGuessEncoding": true // Helps with older files
+    "files.autoGuessEncoding": true,
+    "files.associations": {
+        "memory": "cpp",
+        "vector": "cpp",
+        "type_traits": "cpp",
+        "unordered_map": "cpp"
+    } // Helps with older files
 }

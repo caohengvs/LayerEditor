@@ -1,9 +1,21 @@
 #pragma once
 #include <QGraphicsScene>
-#include <QGraphicsTextItem>
+#include <QKeyEvent>
+#include <unordered_map>
+#include <QGraphicsRectItem>
+
 class CustomScene final : public QGraphicsScene
 {
     Q_OBJECT
+
+    enum class ItemType
+    {
+        ImageItem,
+        SelectRect
+    };
+
+    template<typename T>
+    using ItemMap = std::unordered_map<ItemType, std::unique_ptr<T>>;
 
 public:
     explicit CustomScene(QObject* parent = nullptr);
@@ -12,13 +24,9 @@ public:
     ~CustomScene() override = default;
 
 public:
-    void setDefaultText(const QString& text);
-    void clearDefaultText();
     bool loadImage(const QString& filePath);
+    void showSelectRect(bool show = true);
 
 private:
-    void initDefaultText(const QString& text);
-
-private:
-    QGraphicsTextItem* m_defaultTextItem = nullptr; 
+    ItemMap<QGraphicsItem> m_itemMap;
 };

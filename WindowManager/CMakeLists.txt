@@ -9,6 +9,8 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(Qt5 COMPONENTS Widgets Core Gui REQUIRED)
+find_package(magic_enum CONFIG REQUIRED)
+
 file(GLOB_RECURSE SOURCES "*.hpp" "*.cpp")
 file(GLOB_RECURSE RESOURCES "*.qrc")
 message(${RESOURCES})
@@ -24,6 +26,7 @@ target_link_directories(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME} 
     PRIVATE Qt5::Widgets
+    PRIVATE magic_enum::magic_enum
     PRIVATE "$<IF:$<CONFIG:Debug>,Loggerd,Logger>"
 ) 
 

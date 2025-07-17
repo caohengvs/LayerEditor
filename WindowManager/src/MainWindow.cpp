@@ -54,7 +54,6 @@ void MainWindow::init()
     auto& [previewScene, previewViews] = m_previewSceneAndView;
 
     previewScene = new CustomScene(centralWidget);
-    previewScene->setDefaultText("预览区域");
 
     QGridLayout* mainLayout = new QGridLayout(centralWidget);
     QHBoxLayout* previewLayout = new QHBoxLayout(nullptr);
@@ -82,7 +81,6 @@ void MainWindow::init()
 
         previewLayout->addWidget(itView);
     }
-    previewScene->clearDefaultText();
 
     rowCount = mainLayout->rowCount();
     mainLayout->addLayout(previewLayout, rowCount + 1, 0, 1, 2);
@@ -93,4 +91,9 @@ void MainWindow::init()
             [&scene](const auto& filePath) { 
                 scene->loadImage(filePath);
             });
+    connect(customMenuBar, &CustomMenuBar::removeClicked, this,
+            [&scene]() {
+                scene->showSelectRect();
+            }   
+         );
 }

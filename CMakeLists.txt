@@ -61,6 +61,7 @@ if(WIN32)
     endif()
 endif()
 
+
 set_target_properties(${PROJECT_NAME} PROPERTIES 
     VS_DEBUGGER_WORKING_DIRECTORY ${OUTPUT_DIR}
     RUNTIME_OUTPUT_DIRECTORY_DEBUG ${OUTPUT_DIR}/bin

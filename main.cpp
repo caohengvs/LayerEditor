@@ -1,10 +1,11 @@
 #include <QApplication>
 #include <QDebug>
-#include <iostream>
 #include <QFile>
 #include <QTextStream>
+#include <iostream>
 #include "Logger.hpp"
 #include "MainWindow.hpp"
+
 
 int main(int argc, char** argv)
 {
@@ -13,23 +14,6 @@ int main(int argc, char** argv)
     QApplication app(argc, argv);
 
     app.setApplicationName("LayerEditor");
-    qInfo() << "Application Name:" << app.applicationName();
-
-    QIcon appIcon(":/icons/app.svg");
-    app.setWindowIcon(appIcon);
-    QFile styleFile(":/styles/qss/dark_theme.qss");  
-    if (styleFile.open(QFile::ReadOnly | QFile::Text))
-    {
-        QTextStream ts(&styleFile);
-        QString styleSheet = ts.readAll();
-        app.setStyleSheet(styleSheet); 
-        styleFile.close();
-    }
-    else
-    {
-        qWarning("Could not open stylesheet file: %s", qPrintable(styleFile.fileName()));
-    }
-
     qInstallMessageHandler(
         [](QtMsgType type, const QMessageLogContext& context, const QString& msg)
         {
@@ -62,6 +46,23 @@ int main(int argc, char** argv)
                     abort();
             }
         });
+    
+    qInfo() << "Application Name:" << app.applicationName();
+
+    QIcon appIcon(":/icons/app.svg");
+    app.setWindowIcon(appIcon);
+    QFile styleFile(":/styles/qss/dark_theme.qss");
+    if (styleFile.open(QFile::ReadOnly | QFile::Text))
+    {
+        QTextStream ts(&styleFile);
+        QString styleSheet = ts.readAll();
+        app.setStyleSheet(styleSheet);
+        styleFile.close();
+    }
+    else
+    {
+        qWarning("Could not open stylesheet file: %s", qPrintable(styleFile.fileName()));
+    }
 
     MainWindow* mainWindow = nullptr;
     mainWindow = new MainWindow();
