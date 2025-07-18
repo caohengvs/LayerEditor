@@ -31,12 +31,14 @@ bool CustomScene::loadImage(const QString& filePath)
     addItem(pItem.get());
     m_itemMap.insert_or_assign(ItemType::ImageItem, std::move(pItem));
     qDebug() << magic_enum::enum_name(ItemType::ImageItem).data() << "loaded successfully from" << filePath;
+    m_imagePath = filePath;
+
     return true;
 }
 
 void CustomScene::showSelectRect(bool show)
 {
-    auto pItem = std::make_unique<QGraphicsRectItem>(QRectF(0, 0, 100, 100), nullptr);
+    auto pItem = std::make_unique<QGraphicsRectItem>(QRectF(0, 0, 120, 50), nullptr);
     pItem->setPen(QPen(Qt::red, 2));
     pItem->setBrush(QBrush(Qt::transparent));
     pItem->setFlag(QGraphicsItem::ItemIsMovable);
@@ -46,11 +48,18 @@ void CustomScene::showSelectRect(bool show)
     addItem(pItem.get());
 
     m_itemMap.insert_or_assign(ItemType::SelectRect, std::move(pItem));
-    connect(this, &QGraphicsScene::selectionChanged, this,
-            [this]()
-            {
-                QPointF point =
-                    m_itemMap[ItemType::ImageItem]->mapFromItem(m_itemMap[ItemType::SelectRect].get(), QPointF(0, 0));
-                qDebug() << "SelectRect position:" << point << m_itemMap[ItemType::SelectRect]->boundingRect().size();
-            });
+    connect(
+        this, &QGraphicsScene::selectionChanged, this,
+        [this]()
+        {
+         
+        });
+}
+
+const QRectF CustomScene::getSelectRect()
+{
+    auto point = m_itemMap[ItemType::ImageItem]->mapFromItem(m_itemMap[ItemType::SelectRect].get(), QPointF(0, 0));
+    auto size = m_itemMap[ItemType::SelectRect]->boundingRect().size();
+
+    return QRectF(point, size);
 }

@@ -48,9 +48,6 @@ void CustomView::wheelEvent(QWheelEvent* event)
         scale(1.0 / scaleFactor, 1.0 / scaleFactor);
     }
 
-    QPointF newScenePos = mapToScene(event->pos());
-    QPointF delta = newScenePos - scenePos;
-    translate(delta.x(), delta.y());
     event->accept();
 }
 

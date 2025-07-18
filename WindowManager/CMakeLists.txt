@@ -22,17 +22,20 @@ add_library(${PROJECT_NAME} SHARED
 
 target_link_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/Logger/lib
+    ${CMAKE_SOURCE_DIR}/ImageProcessor/lib
 )
 
 target_link_libraries(${PROJECT_NAME} 
     PRIVATE Qt5::Widgets
     PRIVATE magic_enum::magic_enum
     PRIVATE "$<IF:$<CONFIG:Debug>,Loggerd,Logger>"
+    PRIVATE "$<IF:$<CONFIG:Debug>,ImageProcessord,ImageProcessor>"
 ) 
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/CommonDef/include>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/Logger/include>
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/ImageProcessor/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/CustomTitleBar/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/CustomGraphics/include>

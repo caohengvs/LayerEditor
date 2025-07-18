@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QGuiApplication>
 #include <QScreen>
+#include <ImageProcessor.hpp>
 #include "CustomFileListWidget.hpp"
 #include "CustomMenuBar.hpp"
 #include "CustomScene.hpp"
@@ -96,4 +97,14 @@ void MainWindow::init()
                 scene->showSelectRect();
             }   
          );
+
+    connect(customMenuBar, &CustomMenuBar::doneClicked, this,
+            [&scene]() {
+                const auto& rc = scene->getSelectRect();
+                ImageProcessor imageProcessor(scene->getImagePath().toStdString());
+
+                imageProcessor.processImage({static_cast<int>(rc.x()), static_cast<int>(rc.y()),
+                                             static_cast<int>(rc.width()), static_cast<int>(rc.height())});
+
+            });
 }

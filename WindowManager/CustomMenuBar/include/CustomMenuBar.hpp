@@ -16,11 +16,13 @@ signals:
     void importClicked();
     void playAndPauseClicked();
     void removeClicked();
+    void doneClicked();
 
 private slots:
     void onImportButtonClicked();
     void onPlayAndPauseButtonClicked();
     void onRemoveButtonClicked();
+    void onDoneButtonClicked();
 
 private:
     QHBoxLayout* m_mainLayout; 

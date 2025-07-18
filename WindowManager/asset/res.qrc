@@ -6,5 +6,6 @@
     <file>play.svg</file>
     <file>pause.svg</file>
     <file>app.svg</file>
+    <file>done.svg</file>
 </qresource>
 </RCC>

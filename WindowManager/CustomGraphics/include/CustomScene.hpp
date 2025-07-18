@@ -1,8 +1,9 @@
 #pragma once
+#include <QGraphicsRectItem>
 #include <QGraphicsScene>
 #include <QKeyEvent>
 #include <unordered_map>
-#include <QGraphicsRectItem>
+
 
 class CustomScene final : public QGraphicsScene
 {
@@ -26,7 +27,14 @@ public:
 public:
     bool loadImage(const QString& filePath);
     void showSelectRect(bool show = true);
+    const QRectF getSelectRect();
+
+    inline const QString& getImagePath() const
+    {
+        return m_imagePath;
+    }
 
 private:
     ItemMap<QGraphicsItem> m_itemMap;
+    QString m_imagePath;
 };

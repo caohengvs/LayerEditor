@@ -38,6 +38,7 @@ CustomMenuBar::CustomMenuBar(QWidget* parent)
     QPushButton* importBtn = new QPushButton;
     QPushButton* removeBtn = new QPushButton;
     QPushButton* playAndPauseBtn = new QPushButton;
+    QPushButton* doneBtn = new QPushButton;
     auto setupButton = [](QPushButton* btn, const QString& strPath)
     {
         QIcon icon(strPath);
@@ -49,16 +50,19 @@ CustomMenuBar::CustomMenuBar(QWidget* parent)
     setupButton(importBtn, ":/icons/import.svg");
     setupButton(playAndPauseBtn, ":/icons/play.svg");
     setupButton(removeBtn, ":/icons/remove.svg");
+    setupButton(doneBtn, ":/icons/done.svg");
 
     m_mainLayout->addWidget(importBtn);
     m_mainLayout->addWidget(playAndPauseBtn);
     m_mainLayout->addWidget(removeBtn);
+    m_mainLayout->addWidget(doneBtn);
 
     m_mainLayout->addStretch();
 
     connect(importBtn, &QPushButton::clicked, this, &CustomMenuBar::onImportButtonClicked);
     connect(playAndPauseBtn, &QPushButton::clicked, this, &CustomMenuBar::onPlayAndPauseButtonClicked);
     connect(removeBtn, &QPushButton::clicked, this, &CustomMenuBar::onRemoveButtonClicked);
+    connect(doneBtn, &QPushButton::clicked, this, &CustomMenuBar::onDoneButtonClicked);
 }
 
 CustomMenuBar::~CustomMenuBar()
@@ -78,4 +82,9 @@ void CustomMenuBar::onPlayAndPauseButtonClicked()
 void CustomMenuBar::onRemoveButtonClicked()
 {
     emit removeClicked();
+}
+
+void CustomMenuBar::onDoneButtonClicked()
+{
+    emit doneClicked();
 }
