@@ -100,11 +100,6 @@ void MainWindow::init()
 
     connect(customMenuBar, &CustomMenuBar::doneClicked, this,
             [&scene]() {
-                const auto& rc = scene->getSelectRect();
-                ImageProcessor imageProcessor(scene->getImagePath().toStdString());
-
-                imageProcessor.processImage({static_cast<int>(rc.x()), static_cast<int>(rc.y()),
-                                             static_cast<int>(rc.width()), static_cast<int>(rc.height())});
-
+                scene->processImage();
             });
 }

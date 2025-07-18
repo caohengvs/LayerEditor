@@ -81,6 +81,7 @@
         "xtr1common": "cpp",
         "xtree": "cpp",
         "xutility": "cpp",
-        "qgraphicspixmapitem": "cpp"
+        "qgraphicspixmapitem": "cpp",
+        "qpropertyanimation": "cpp"
     } // Helps with older files
 }
