@@ -18,7 +18,8 @@ class CustomScene final : public QGraphicsScene
         RotatingRectItem
     };
 
-    using ItemMap = std::unordered_map<ItemType, std::variant<QGraphicsItem*, std::pair<QString, QGraphicsItem*>>>;
+    using ItemValue = std::variant<QGraphicsItem*, std::pair<QString, QGraphicsItem*>>;
+    using ItemMap = std::unordered_map<ItemType, ItemValue>;
 
 public:
     explicit CustomScene(QObject* parent = nullptr);
@@ -31,7 +32,6 @@ public:
     bool processImage();
     void showSelectRect(bool show = true);
     const QRectF getSelectRect();
-
 
 private:
     ItemMap m_itemMap;
