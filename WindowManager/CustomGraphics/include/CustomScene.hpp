@@ -34,6 +34,5 @@ public:
     const QRectF getSelectRect();
 
 private:
-    ItemMap m_itemMap;
-    RotatingRectItem* m_itemRotating;
+    ItemMap m_itemMap;  // Map to store items by type
 };

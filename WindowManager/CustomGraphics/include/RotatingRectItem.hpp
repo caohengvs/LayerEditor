@@ -13,9 +13,10 @@ class RotatingRectItem
 
     Q_PROPERTY(qreal rotation READ rotation WRITE setRotation)
 
-public:
+private:
     using AnimationCallback = std::function<void()>;
 
+public:
     explicit RotatingRectItem(const QRectF& rect, QGraphicsItem* parent = nullptr);
     ~RotatingRectItem() override;
 

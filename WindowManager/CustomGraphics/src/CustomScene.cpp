@@ -6,19 +6,16 @@
 
 CustomScene::CustomScene(QObject* parent)
     : QGraphicsScene(parent)
-    , m_itemRotating(nullptr)
 {
 }
 
 CustomScene::CustomScene(const QRectF& sceneRect, QObject* parent)
     : QGraphicsScene(sceneRect, parent)
-    , m_itemRotating(nullptr)
 {
 }
 
 CustomScene::CustomScene(qreal x, qreal y, qreal width, qreal height, QObject* parent)
     : QGraphicsScene(x, y, width, height, parent)
-    , m_itemRotating(nullptr)
 {
 }
 

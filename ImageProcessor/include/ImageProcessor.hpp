@@ -1,4 +1,13 @@
 #pragma once
+/**
+ * @file: ImageProcessor.hpp
+ * @brief: file brief description
+ * @author: Curtis
+ * @date: 2025-07-22 09:07:45
+ * @version: 1.0
+ * @email: caohengvs888@gmail.com
+ */
+
 #include <string>
 #include "CommonDef/ExportDef.h"
 class LIB_API ImageProcessor
