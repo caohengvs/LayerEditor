@@ -82,6 +82,10 @@
         "xtree": "cpp",
         "xutility": "cpp",
         "qgraphicspixmapitem": "cpp",
-        "qpropertyanimation": "cpp"
+        "qpropertyanimation": "cpp",
+        "resumable": "cpp",
+        "future": "cpp",
+        "xthread": "cpp",
+        "qpointer": "cpp"
     } // Helps with older files
 }

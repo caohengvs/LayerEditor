@@ -2,9 +2,10 @@
 #include <QGraphicsRectItem>
 #include <QGraphicsScene>
 #include <QKeyEvent>
-#include <unordered_map>
-#include <RotatingRectItem.hpp>
 #include <QPointer>
+#include <RotatingRectItem.hpp>
+#include <unordered_map>
+#include <variant>
 
 class CustomScene final : public QGraphicsScene
 {
@@ -17,7 +18,7 @@ class CustomScene final : public QGraphicsScene
         RotatingRectItem
     };
 
-    using ItemMap = std::unordered_map<ItemType,QGraphicsItem*>;
+    using ItemMap = std::unordered_map<ItemType, std::variant<QGraphicsItem*, std::pair<QString, QGraphicsItem*>>>;
 
 public:
     explicit CustomScene(QObject* parent = nullptr);
@@ -31,13 +32,8 @@ public:
     void showSelectRect(bool show = true);
     const QRectF getSelectRect();
 
-    inline const QString& getImagePath() const
-    {
-        return m_imagePath;
-    }
 
 private:
     ItemMap m_itemMap;
-    QString m_imagePath;
     RotatingRectItem* m_itemRotating;
 };
