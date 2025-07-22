@@ -23,7 +23,7 @@ target_link_libraries(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME} PRIVATE
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/Logger/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${OpenCV_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS}
     $<INSTALL_INTERFACE:include>
 )
 

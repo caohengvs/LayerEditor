@@ -59,6 +59,7 @@ bool CustomScene::processImage()
         qDebug() << "No image item found in the scene.";
         return false;
     }
+    const auto& [path, item] = std::get<std::pair<QString, QGraphicsItem*>>(itImageFind->second);
 
     const auto& rc = getSelectRect();
 
@@ -67,11 +68,11 @@ bool CustomScene::processImage()
     m_itemMap.insert_or_assign(ItemType::RotatingRectItem, pItem);
 
     pItem->startRotationAnimation(
-        [this, rc, itImageFind]()
+        [this, rc, path, item]()
         {
-            const auto& [path, item] = std::get<std::pair<QString, QGraphicsItem*>>(itImageFind->second);
             item->setVisible(false);
             ImageProcessor imageProcessor(path.toStdString());
+            // imageProcessor.processImage();
             imageProcessor.processImage({static_cast<int>(rc.x()), static_cast<int>(rc.y()),
                                          static_cast<int>(rc.width()), static_cast<int>(rc.height())});
         },
@@ -79,10 +80,9 @@ bool CustomScene::processImage()
 
     connect(
         pItem, &RotatingRectItem::finished, this,
-        [this, itImageFind]()
+        [this, itImageFind, path, item]()
         {
             qDebug() << "Rotation animation finished.";
-            const auto& [path, item] = std::get<std::pair<QString, QGraphicsItem*>>(itImageFind->second);
             item->setVisible(true);
             auto rectItem = std::get<QGraphicsItem*>(m_itemMap[ItemType::RotatingRectItem]);
             removeItem(rectItem);

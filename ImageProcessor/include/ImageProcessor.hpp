@@ -10,23 +10,33 @@
 
 #include <string>
 #include "CommonDef/ExportDef.h"
+namespace cv
+{
+class Mat;
+};  // namespace cv
+
 class LIB_API ImageProcessor
 {
     struct STMaskRegion
     {
-        int x; 
-        int y; 
-        int w; 
-        int h; 
+        int x;
+        int y;
+        int w;
+        int h;
     };
     using PSTMaskRegion = STMaskRegion*;
-    
+
 public:
     explicit ImageProcessor(const std::string& path);
     ~ImageProcessor();
 
     signed char processImage(const STMaskRegion& maskRegion);
+    signed char processImage();
 
 private:
-    std::string m_strImgPath; // 默认路径
+    void fftshift(const cv::Mat& inputImg, cv::Mat& outputImg);
+   
+
+private:
+    std::string m_strImgPath;  // 默认路径
 };
