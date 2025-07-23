@@ -1,12 +1,21 @@
 #pragma once
+#include <QCursor>
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneMouseEvent>
-#include <QCursor>
+
 
 class ResizableRectItem : public QGraphicsRectItem
 {
 public:
-    enum HandleType { None, TopLeft, TopRight, BottomLeft, BottomRight, Move };
+    enum HandleType
+    {
+        None,
+        TopLeft,
+        TopRight,
+        BottomLeft,
+        BottomRight,
+        Move
+    };
     ResizableRectItem(const QRectF& rect, QGraphicsItem* parent = nullptr);
 
 protected:

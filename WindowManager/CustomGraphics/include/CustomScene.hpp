@@ -32,6 +32,9 @@ public:
     bool processImage();
     void showSelectRect(bool show = true);
     const QRectF getSelectRect();
+    void hide();
+    void show(ItemType type);
+    void remove(ItemType type);
 
 private:
     ItemMap m_itemMap;  // Map to store items by type

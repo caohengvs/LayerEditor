@@ -16,6 +16,9 @@ class RotatingRectItem
 private:
     using AnimationCallback = std::function<void()>;
 
+protected:
+    void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;
+
 public:
     explicit RotatingRectItem(const QRectF& rect, QGraphicsItem* parent = nullptr);
     ~RotatingRectItem() override;
