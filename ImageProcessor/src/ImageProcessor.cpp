@@ -220,7 +220,7 @@ bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
                                                             mask_input_shape.data(), mask_input_shape.size()));
 
     std::vector<const char*> model_input_names_ordered;
-    model_input_names_ordered.reserve(2);
+    model_input_names_ordered.resize(2);
     model_input_names_ordered[image_input_idx] = input_image_name;
     model_input_names_ordered[mask_input_idx] = input_mask_name;
 
