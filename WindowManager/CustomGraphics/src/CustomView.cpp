@@ -21,7 +21,7 @@ CustomView::~CustomView()
 
 void CustomView::wheelEvent(QWheelEvent* event)
 {
-    auto pScene = scene();
+    auto* pScene = scene();
     if (!pScene)
     {
         event->accept();

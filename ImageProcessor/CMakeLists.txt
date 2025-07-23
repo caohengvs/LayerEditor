@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.20.0)
+project(ImageProcessor)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-project(ImageProcessor)
+set(CMAKE_CXX_EXTENSIONS OFF) 
+set(onnxruntime_ROOT ${3rd_PARTY_ROOT}/onnxruntime-win-x64-1.21.0)
 
 file(GLOB SOURCES "src/*.cpp" "include/*.hpp")
 
@@ -13,18 +16,21 @@ add_library(${PROJECT_NAME} SHARED
 
 target_link_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/Logger/lib
+    ${onnxruntime_ROOT}/lib
 )
 
 target_link_libraries(${PROJECT_NAME} 
     PRIVATE "$<IF:$<CONFIG:Debug>,Loggerd,Logger>"
     PRIVATE ${OpenCV_LIBS}
+    PRIVATE onnxruntime
 ) 
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/Logger/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    <INSTALL_INTERFACE:include>
     ${OpenCV_INCLUDE_DIRS}
-    $<INSTALL_INTERFACE:include>
+    ${onnxruntime_ROOT}/include
 )
 
 include(${CMAKE_ROOT_DIR}/ProjectConfig.cmake)

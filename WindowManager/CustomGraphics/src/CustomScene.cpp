@@ -21,7 +21,7 @@ CustomScene::CustomScene(qreal x, qreal y, qreal width, qreal height, QObject* p
 
 bool CustomScene::loadImage(const QString& filePath)
 {
-    const auto& pItem = new QGraphicsPixmapItem(QPixmap(filePath));
+    auto* pItem = new QGraphicsPixmapItem(QPixmap(filePath));
     if (pItem->pixmap().isNull())
     {
         qDebug() << "Failed to load image from" << filePath;
@@ -63,7 +63,7 @@ bool CustomScene::processImage()
 
     const auto& rc = getSelectRect();
 
-    auto pItem = new RotatingRectItem(QRectF(sceneRect().center(), QSizeF(50, 50)));
+    auto* pItem = new RotatingRectItem(QRectF(sceneRect().center(), QSizeF(50, 50)));
     addItem(pItem);
     m_itemMap.insert_or_assign(ItemType::RotatingRectItem, pItem);
 
@@ -72,8 +72,7 @@ bool CustomScene::processImage()
         {
             item->setVisible(false);
             ImageProcessor imageProcessor(path.toStdString());
-            // imageProcessor.processImage();
-            imageProcessor.processImage({static_cast<int>(rc.x()), static_cast<int>(rc.y()),
+            imageProcessor.processImageByAI({static_cast<int>(rc.x()), static_cast<int>(rc.y()),
                                          static_cast<int>(rc.width()), static_cast<int>(rc.height())});
         },
         1000);
@@ -84,7 +83,7 @@ bool CustomScene::processImage()
         {
             qDebug() << "Rotation animation finished.";
             item->setVisible(true);
-            auto rectItem = std::get<QGraphicsItem*>(m_itemMap[ItemType::RotatingRectItem]);
+            auto* rectItem = std::get<QGraphicsItem*>(m_itemMap[ItemType::RotatingRectItem]);
             removeItem(rectItem);
             m_itemMap.erase(ItemType::RotatingRectItem);
         },
@@ -95,7 +94,16 @@ bool CustomScene::processImage()
 
 void CustomScene::showSelectRect(bool show)
 {
-    const auto& pItem = new QGraphicsRectItem(QRectF(0, 0, 120, 50), nullptr);
+    const auto& itFind = m_itemMap.find(ItemType::SelectRect);
+    if (itFind != m_itemMap.end())
+    {
+        auto [key, val] = *itFind;
+        auto* item = std::get<QGraphicsItem*>(val);
+
+        removeItem(item);
+        m_itemMap.erase(ItemType::SelectRect);
+    }
+    auto* pItem = new QGraphicsRectItem(QRectF(0, 0, 120, 50), nullptr);
     pItem->setPen(QPen(Qt::red, 2));
     pItem->setBrush(QBrush(Qt::transparent));
     pItem->setFlag(QGraphicsItem::ItemIsMovable);

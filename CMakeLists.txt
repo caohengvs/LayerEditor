@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.20.0)
 cmake_policy(SET CMP0074 NEW)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF) 
 set(CMAKE_TOOLCHAIN_FILE "D:/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "vcpkg toolchain file")
 set(VCPKG_TARGET_TRIPLET "x64-windows" CACHE STRING "")
 set(CMAKE_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
@@ -12,6 +13,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 project(LayerEditor VERSION 0.1.0 LANGUAGES C CXX)
 set(Qt5_ROOT "D:/Qt/5.12.12/msvc2017_64")
+set(3rd_PARTY_ROOT "D:/repos/3rdParty")
 find_package(Qt5 COMPONENTS Widgets Core Gui REQUIRED)
 
 include_directories(
