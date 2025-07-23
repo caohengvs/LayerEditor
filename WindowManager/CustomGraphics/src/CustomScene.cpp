@@ -2,6 +2,7 @@
 #include <ImageProcessor.hpp>
 #include <QDebug>
 #include <QGraphicsPixmapItem>
+#include <ResizableRectItem.hpp>
 #include <magic_enum/magic_enum.hpp>
 
 CustomScene::CustomScene(QObject* parent)
@@ -103,13 +104,7 @@ void CustomScene::showSelectRect(bool show)
         removeItem(item);
         m_itemMap.erase(ItemType::SelectRect);
     }
-    auto* pItem = new QGraphicsRectItem(QRectF(0, 0, 120, 50), nullptr);
-    pItem->setPen(QPen(Qt::red, 2));
-    pItem->setBrush(QBrush(Qt::transparent));
-    pItem->setFlag(QGraphicsItem::ItemIsMovable);
-    pItem->setFlag(QGraphicsItem::ItemIsSelectable);
-    pItem->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
-
+    auto* pItem = new ResizableRectItem(QRectF(0, 0, 120, 50), nullptr);
     addItem(pItem);
     m_itemMap.insert_or_assign(ItemType::SelectRect, pItem);
 }
@@ -126,7 +121,7 @@ const QRectF CustomScene::getSelectRect()
     }
 
     const auto& [path, imageItem] = std::get<std::pair<QString, QGraphicsItem*>>(itImageFind->second);
-    const auto& selectRectItem = std::get<QGraphicsItem*>(itSelectFind->second);
+    auto* selectRectItem = std::get<QGraphicsItem*>(itSelectFind->second);
 
     return QRectF(imageItem->mapFromItem(selectRectItem, QPointF(0, 0)), selectRectItem->boundingRect().size());
 }
