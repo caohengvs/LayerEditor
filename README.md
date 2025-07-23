@@ -18,7 +18,7 @@
 - C++17 compiler(msvc)
 - Qt5.12.12
 - onnxruntime-win-x64-1.21.0 or later(需要自行下载，并放到D:\repos\3rdparty)
-- Models(需要自行下载，并放到生成后的运行目录下:your code path\bin\models),这里用的模型是lama_fp32.onnx[text](https://huggingface.co/Carve/LaMa-ONNX/tree/main)
+- Models(需要自行下载，并放到生成后的运行目录下:your code path\bin\models)，这里用的模型是 [lama_fp32.onnx](https://huggingface.co/Carve/LaMa-ONNX/tree/main)
 
 ## 🚀 Quick Start
 
