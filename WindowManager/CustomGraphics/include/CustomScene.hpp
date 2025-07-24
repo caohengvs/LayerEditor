@@ -18,7 +18,7 @@ class CustomScene final : public QGraphicsScene
         RotatingRectItem
     };
 
-    using ItemValue = std::variant<QGraphicsItem*, std::pair<QString, QGraphicsItem*>, std::pair<bool, QGraphicsItem*>>;
+    using ItemValue = std::variant<QGraphicsItem*, std::pair<QString, QGraphicsItem*>>;
     using ItemMap = std::unordered_map<ItemType, ItemValue>;
 
 public:

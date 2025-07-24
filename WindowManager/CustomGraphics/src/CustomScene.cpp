@@ -91,6 +91,7 @@ bool CustomScene::processImage()
             qDebug() << "Rotation animation finished.";
             hide();
             show(ItemType::ImageItem);
+            show(ItemType::SelectRect);
             remove(ItemType::RotatingRectItem);
         },
         Qt::QueuedConnection);
@@ -103,7 +104,7 @@ void CustomScene::showSelectRect(bool bShow)
     if (!hasItem(ItemType::SelectRect))
     {
         auto* pItem = new ResizableRectItem(getCenter(QSize(120, 50)), nullptr);
-        addItem(ItemType::SelectRect, std::pair<bool, QGraphicsItem*>(bShow, pItem));
+        addItem(ItemType::SelectRect, pItem);
         setTop(ItemType::SelectRect);
         return;
     }
@@ -114,19 +115,17 @@ void CustomScene::showSelectRect(bool bShow)
 
 const QRectF CustomScene::getSelectRect()
 {
-    const auto& itImageFind = m_itemMap.find(ItemType::ImageItem);
-    const auto& itSelectFind = m_itemMap.find(ItemType::SelectRect);
+    auto* pSelectItem = getItem(ItemType::SelectRect);
+    auto* pImgItem = getItem(ItemType::ImageItem);
 
-    if (itImageFind == m_itemMap.end() || itSelectFind == m_itemMap.end())
+    if (pSelectItem == nullptr || pImgItem == nullptr)
     {
-        qDebug() << "Image or SelectRect item not found in the scene.";
+        qDebug() << "SelectRect or ImageItem not found in the scene.";
         return QRectF();
     }
 
-    const auto& [path, imageItem] = std::get<std::pair<QString, QGraphicsItem*>>(itImageFind->second);
-    auto* selectRectItem = std::get<QGraphicsItem*>(itSelectFind->second);
-
-    return QRectF(imageItem->mapFromItem(selectRectItem, QPointF(0, 0)), selectRectItem->boundingRect().size());
+    return QRectF(pImgItem->mapFromItem(pSelectItem, pSelectItem->boundingRect().topLeft()),
+                  pSelectItem->boundingRect().size());
 }
 
 void CustomScene::hide()
@@ -219,10 +218,6 @@ QGraphicsItem* CustomScene::getItem(ItemType type) const
             {
                 itemToModify = arg.second;
             }
-            else if constexpr (std::is_same_v<T, std::pair<bool, QGraphicsItem*>>)
-            {
-                itemToModify = arg.second;
-            }
             else if constexpr (std::is_same_v<T, QGraphicsItem*>)
             {
                 itemToModify = arg;
@@ -250,10 +245,6 @@ void CustomScene::addItem(ItemType type, const ItemValue& val)
                 itemToAdd = arg;
             }
             else if constexpr (std::is_same_v<T, std::pair<QString, QGraphicsItem*>>)
-            {
-                itemToAdd = arg.second;
-            }
-            else if constexpr (std::is_same_v<T, std::pair<bool, QGraphicsItem*>>)
             {
                 itemToAdd = arg.second;
             }
