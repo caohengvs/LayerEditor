@@ -51,6 +51,7 @@ void MainWindow::init()
 
     m_customFileList->setFixedWidth(200);
     view->setMinimumSize(QSize(width() / 2, 400));
+    scene->setSceneRect(0, 0, view->width(), view->height());
 
     auto& [previewScene, previewViews] = m_previewSceneAndView;
 
@@ -92,9 +93,12 @@ void MainWindow::init()
             [&scene](const auto& filePath) { 
                 scene->loadImage(filePath);
             });
+
     connect(customMenuBar, &CustomMenuBar::removeClicked, this,
             [&scene]() {
-                scene->showSelectRect();
+                static bool bShow = true;
+                scene->showSelectRect(bShow);
+                bShow = !bShow;
             }   
          );
 

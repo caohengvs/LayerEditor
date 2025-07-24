@@ -21,6 +21,7 @@ public:
 
 private:
     void wheelEvent(QWheelEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
 
 private:
     void init();

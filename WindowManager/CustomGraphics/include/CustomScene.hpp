@@ -18,7 +18,7 @@ class CustomScene final : public QGraphicsScene
         RotatingRectItem
     };
 
-    using ItemValue = std::variant<QGraphicsItem*, std::pair<QString, QGraphicsItem*>>;
+    using ItemValue = std::variant<QGraphicsItem*, std::pair<QString, QGraphicsItem*>, std::pair<bool, QGraphicsItem*>>;
     using ItemMap = std::unordered_map<ItemType, ItemValue>;
 
 public:
@@ -30,11 +30,18 @@ public:
 public:
     bool loadImage(const QString& filePath);
     bool processImage();
-    void showSelectRect(bool show = true);
+    void showSelectRect(bool bShow = true);
+
+private:
     const QRectF getSelectRect();
     void hide();
-    void show(ItemType type);
+    void show(ItemType type, bool flag = true);
     void remove(ItemType type);
+    const qreal topLevelZValue() const;
+    void setTop(ItemType type);
+    const QRectF getCenter(const QSizeF& size) const;
+    bool hasItem(ItemType type) const;
+    QGraphicsItem* getItem(ItemType type) const;
 
 private:
     ItemMap m_itemMap;  // Map to store items by type

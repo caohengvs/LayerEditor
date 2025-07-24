@@ -29,6 +29,7 @@ private slots:
 private:
     void setupUi();
     bool readConfig(const QString&,  QJsonArray&);
+    void addAction(const QString& actionId, const std::function<void()>& action);
 
 private:
     QHBoxLayout* m_mainLayout;

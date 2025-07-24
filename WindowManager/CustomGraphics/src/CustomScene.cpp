@@ -42,8 +42,15 @@ bool CustomScene::loadImage(const QString& filePath)
         qDebug() << "Failed to load image from" << filePath;
         return false;
     }
-
-    pItem->setTransformationMode(Qt::SmoothTransformation);
+    QRectF sceneRect = this->sceneRect();
+    QPixmap pix = pItem->pixmap();
+    qreal scaleX = sceneRect.width() / pix.width();
+    qreal scaleY = sceneRect.height() / pix.height();
+    qreal scale = qMin(scaleX, scaleY);  // 保持比例
+    pItem->setScale(scale);
+    qreal x = sceneRect.center().x() - (pix.width() * scale) / 2.0;
+    qreal y = sceneRect.center().y() - (pix.height() * scale) / 2.0;
+    pItem->setPos(x, y);
     addItem(pItem);
     m_itemMap.insert_or_assign(ItemType::ImageItem, std::pair<QString, QGraphicsItem*>(filePath, pItem));
     qDebug() << magic_enum::enum_name(ItemType::ImageItem).data() << "loaded successfully from" << filePath;
@@ -63,10 +70,7 @@ bool CustomScene::processImage()
 
     const auto& rc = getSelectRect();
 
-    QPointF center = sceneRect().center();
-    QSizeF size(50, 50);
-    QRectF rect(center.x() - size.width() / 2, center.y() - size.height() / 2, size.width(), size.height());
-    auto* pItem = new RotatingRectItem(rect);
+    auto* pItem = new RotatingRectItem(getCenter(QSizeF(50, 50)));
     addItem(pItem);
     m_itemMap.insert_or_assign(ItemType::RotatingRectItem, pItem);
 
@@ -96,12 +100,18 @@ bool CustomScene::processImage()
     return true;
 }
 
-void CustomScene::showSelectRect(bool show)
+void CustomScene::showSelectRect(bool bShow)
 {
-    remove(ItemType::SelectRect);  // Ensure only one SelectRect exists at a time
-    auto* pItem = new ResizableRectItem(QRectF(0, 0, 120, 50), nullptr);
-    addItem(pItem);
-    m_itemMap.insert_or_assign(ItemType::SelectRect, pItem);
+    if (!hasItem(ItemType::SelectRect))
+    {
+        auto* pItem = new ResizableRectItem(getCenter(QSize(120, 50)), nullptr);
+        addItem(pItem);
+        pItem->setZValue(topLevelZValue() + 1);
+        m_itemMap.insert_or_assign(ItemType::SelectRect, std::pair<bool, QGraphicsItem*>(bShow, pItem));
+        return;
+    }
+
+    show(ItemType::SelectRect, bShow);
 }
 
 const QRectF CustomScene::getSelectRect()
@@ -129,69 +139,103 @@ void CustomScene::hide()
     }
 }
 
-void CustomScene::show(ItemType type)
+void CustomScene::show(ItemType type, bool bFlag)
 {
-    const auto& itFind = m_itemMap.find(type);
-    if (itFind == m_itemMap.end())
+    auto* pItem = getItem(type);
+    if(!pItem)
     {
-        qDebug() << "Item of type" << magic_enum::enum_name(type).data() << "not found in the scene.";
         return;
     }
 
-    auto [key, val] = *itFind;
-    switch (type)
-    {
-        case ItemType::ImageItem:
-        {
-            const auto& [path, item] = std::get<std::pair<QString, QGraphicsItem*>>(val);
-            item->setVisible(true);
-            break;
-        }
-        case ItemType::SelectRect:
-            [[fallthrough]];
-        case ItemType::RotatingRectItem:
-        {
-            auto* item = std::get<QGraphicsItem*>(val);
-            item->setVisible(true);
-            break;
-        }
-        default:
-            break;
-    }
-
-    qDebug() << magic_enum::enum_name(type).data() << "is now visible.";
+    pItem->setVisible(bFlag);
+    qDebug() << magic_enum::enum_name(type).data() << "is now" << (bFlag ? "visible." : "hidden.");
 }
 
 void CustomScene::remove(ItemType type)
 {
-    const auto& itFind = m_itemMap.find(type);
-    if (itFind == m_itemMap.end())
+    auto* pItem = getItem(type);
+    if (!pItem)
+    {
+        return;
+    }
+
+    removeItem(pItem);
+
+    m_itemMap.erase(type);
+
+    qDebug() << magic_enum::enum_name(type).data() << "removed from the scene.";
+}
+
+const qreal CustomScene::topLevelZValue() const
+{
+    qreal maxZ = 0;
+    for (auto* item : items())
+    {
+        maxZ = std::max(maxZ, item->zValue());
+    }
+    return maxZ;
+}
+
+void CustomScene::setTop(ItemType type)
+{
+    auto* pItem = getItem(type);
+    if (!pItem)
     {
         qDebug() << "Item of type" << magic_enum::enum_name(type).data() << "not found in the scene.";
         return;
     }
-    switch (type)
-    {
-        case ItemType::ImageItem:
-        {
-            const auto& [path, item] = std::get<std::pair<QString, QGraphicsItem*>>(itFind->second);
-            removeItem(item);
-            break;
-        }
-        case ItemType::SelectRect:
-            [[fallthrough]];
-        case ItemType::RotatingRectItem:
-        {
-            auto* item = std::get<QGraphicsItem*>(itFind->second);
-            removeItem(item);
-            qDebug() << "SelectRect item removed from the scene.";
-            break;
-        }
 
-        default:
-            break;
+    qreal zVal = topLevelZValue() + 1;
+
+    pItem->setZValue(zVal);
+}
+
+const QRectF CustomScene::getCenter(const QSizeF& size) const
+{
+    QPointF center = sceneRect().center();
+    QRectF rect(center.x() - size.width() / 2, center.y() - size.height() / 2, size.width(), size.height());
+    return rect;
+}
+
+bool CustomScene::hasItem(ItemType type) const
+{
+    return m_itemMap.find(type) != m_itemMap.end();
+}
+
+QGraphicsItem* CustomScene::getItem(ItemType type) const
+{
+    QGraphicsItem* itemToModify = nullptr;
+    const auto& itFind = m_itemMap.find(type);
+    if (itFind == m_itemMap.end())
+    {
+        qDebug() << "Item of type" << magic_enum::enum_name(type).data() << "not found in the scene.";
+        return itemToModify;
     }
 
-    m_itemMap.erase(type);
-    qDebug() << magic_enum::enum_name(type).data() << "removed from the scene.";
+    std::visit(
+        [&itemToModify,type](auto&& arg)
+        {
+            using T = std::decay_t<decltype(arg)>;
+
+            if constexpr (std::is_same_v<T, std::pair<QString, QGraphicsItem*>>)
+            {
+                itemToModify = arg.second;
+            }
+            else if constexpr (std::is_same_v<T, std::pair<bool, QGraphicsItem*>>)
+            {
+                itemToModify = arg.second;
+            }
+            else if constexpr (std::is_same_v<T, QGraphicsItem*>)
+            {
+                itemToModify = arg;
+            }
+            else
+            {
+                qDebug() << "not found the type in m_itemMap:" << magic_enum::enum_name(type).data();
+                return;
+            }
+        },
+        itFind->second);
+
+    return itemToModify;
 }

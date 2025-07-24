@@ -11,9 +11,9 @@
 CustomMenuBar::CustomMenuBar(QWidget* parent)
     : QWidget(parent)
 {
-    m_actionMap["101"] = [this]() { this->onSaveButtonClicked(); };
-    m_actionMap["102"] = [this]() { this->onRemoveButtonClicked(); };
-    m_actionMap["103"] = [this]() { this->onDoneButtonClicked(); };
+    addAction("101", [this]() { this->onSaveButtonClicked(); });
+    addAction("102", [this]() { this->onRemoveButtonClicked(); });
+    addAction("103", [this]() { this->onDoneButtonClicked(); });
 
     setupUi();
 
@@ -141,4 +141,9 @@ bool CustomMenuBar::readConfig(const QString& config, QJsonArray& outJson)
 
     outJson.swap(jsonObj["btn"].toArray());
     return true;
+}
+
+void CustomMenuBar::addAction(const QString& actionId, const std::function<void()>& action)
+{
+    m_actionMap[actionId] = action;
 }

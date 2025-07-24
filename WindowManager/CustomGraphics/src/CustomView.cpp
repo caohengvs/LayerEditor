@@ -51,6 +51,14 @@ void CustomView::wheelEvent(QWheelEvent* event)
     event->accept();
 }
 
+void CustomView::resizeEvent(QResizeEvent* event)
+{
+    QGraphicsView::resizeEvent(event);
+    if (scene()) {
+        scene()->setSceneRect(QRectF(QPointF(0, 0), size()));
+    }
+}
+
 void CustomView::init()
 {
     setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
