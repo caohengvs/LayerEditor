@@ -51,8 +51,7 @@ bool CustomScene::loadImage(const QString& filePath)
     qreal x = sceneRect.center().x() - (pix.width() * scale) / 2.0;
     qreal y = sceneRect.center().y() - (pix.height() * scale) / 2.0;
     pItem->setPos(x, y);
-    addItem(pItem);
-    m_itemMap.insert_or_assign(ItemType::ImageItem, std::pair<QString, QGraphicsItem*>(filePath, pItem));
+    addItem(ItemType::ImageItem, std::pair<QString, QGraphicsItem*>(filePath, pItem));
     qDebug() << magic_enum::enum_name(ItemType::ImageItem).data() << "loaded successfully from" << filePath;
 
     return true;
@@ -71,8 +70,7 @@ bool CustomScene::processImage()
     const auto& rc = getSelectRect();
 
     auto* pItem = new RotatingRectItem(getCenter(QSizeF(50, 50)));
-    addItem(pItem);
-    m_itemMap.insert_or_assign(ItemType::RotatingRectItem, pItem);
+    addItem(ItemType::RotatingRectItem, pItem);
 
     pItem->startRotationAnimation(
         [this, rc, path]()
@@ -105,13 +103,13 @@ void CustomScene::showSelectRect(bool bShow)
     if (!hasItem(ItemType::SelectRect))
     {
         auto* pItem = new ResizableRectItem(getCenter(QSize(120, 50)), nullptr);
-        addItem(pItem);
-        pItem->setZValue(topLevelZValue() + 1);
-        m_itemMap.insert_or_assign(ItemType::SelectRect, std::pair<bool, QGraphicsItem*>(bShow, pItem));
+        addItem(ItemType::SelectRect, std::pair<bool, QGraphicsItem*>(bShow, pItem));
+        setTop(ItemType::SelectRect);
         return;
     }
 
     show(ItemType::SelectRect, bShow);
+    setTop(ItemType::SelectRect);
 }
 
 const QRectF CustomScene::getSelectRect()
@@ -142,7 +140,7 @@ void CustomScene::hide()
 void CustomScene::show(ItemType type, bool bFlag)
 {
     auto* pItem = getItem(type);
-    if(!pItem)
+    if (!pItem)
     {
         return;
     }
@@ -213,7 +211,7 @@ QGraphicsItem* CustomScene::getItem(ItemType type) const
     }
 
     std::visit(
-        [&itemToModify,type](auto&& arg)
+        [&itemToModify, type](auto&& arg)
         {
             using T = std::decay_t<decltype(arg)>;
 
@@ -238,4 +236,30 @@ QGraphicsItem* CustomScene::getItem(ItemType type) const
         itFind->second);
 
     return itemToModify;
+}
+
+void CustomScene::addItem(ItemType type, const ItemValue& val)
+{
+    std::visit(
+        [this, type](auto&& arg)
+        {
+            QGraphicsItem* itemToAdd = nullptr;
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, QGraphicsItem*>)
+            {
+                itemToAdd = arg;
+            }
+            else if constexpr (std::is_same_v<T, std::pair<QString, QGraphicsItem*>>)
+            {
+                itemToAdd = arg.second;
+            }
+            else if constexpr (std::is_same_v<T, std::pair<bool, QGraphicsItem*>>)
+            {
+                itemToAdd = arg.second;
+            }
+            QGraphicsScene::addItem(itemToAdd);
+        },
+        val);
+
+    m_itemMap.insert_or_assign(type, val);
 }

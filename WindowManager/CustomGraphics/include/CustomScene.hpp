@@ -42,6 +42,7 @@ private:
     const QRectF getCenter(const QSizeF& size) const;
     bool hasItem(ItemType type) const;
     QGraphicsItem* getItem(ItemType type) const;
+    void addItem(ItemType type, const ItemValue& val);
 
 private:
     ItemMap m_itemMap;  // Map to store items by type
