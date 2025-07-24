@@ -123,9 +123,10 @@ const QRectF CustomScene::getSelectRect()
         qDebug() << "SelectRect or ImageItem not found in the scene.";
         return QRectF();
     }
+    float inverseScale = 1 / pImgItem->scale();
 
     return QRectF(pImgItem->mapFromItem(pSelectItem, pSelectItem->boundingRect().topLeft()),
-                  pSelectItem->boundingRect().size());
+                  pSelectItem->boundingRect().size() * inverseScale);
 }
 
 void CustomScene::hide()

@@ -13,13 +13,13 @@ ImageProcessor::~ImageProcessor()
 {
 }
 
-bool ImageProcessor::processImage(const STMaskRegion& maskRegion)
+std::optional<cv::Mat> ImageProcessor::processImage(const STMaskRegion& maskRegion)
 {
     cv::Mat src = cv::imread(m_strImgPath);
 
     if (src.empty())
     {
-        return false;
+        return std::nullopt;  
     }
 
     cv::Mat mask = cv::Mat::zeros(src.size(), CV_8U);
@@ -30,17 +30,12 @@ bool ImageProcessor::processImage(const STMaskRegion& maskRegion)
     cv::rectangle(mask, watermark_roi, cv::Scalar(255), -1);
 
     cv::Mat repaired_img;
-    double inpaintRadius = 40;
+    double inpaintRadius = 20;
     int inpaintFlags = cv::INPAINT_NS;
     cv::inpaint(src, mask, repaired_img, inpaintRadius, inpaintFlags);
-
-    cv::imshow("repaired", repaired_img);
-
+    cv::imshow("Repaired Image", repaired_img);
     cv::waitKey(0);
-
-    cv::destroyAllWindows();
-
-    return true;
+    return repaired_img;
 }
 
 bool ImageProcessor::processImage()
@@ -196,6 +191,12 @@ bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
         LOG_ERROR << "Failed to read image from path: " << m_strImgPath;
         return false;
     }
+    // cv::Mat src = processImage(maskRegion).value_or(cv::Mat());
+    // if(src.empty())
+    // {
+    //     LOG_ERROR << "Failed to read image from path: " << m_strImgPath;
+    //     return false;
+    // }
 
     cv::Mat mask = cv::Mat::zeros(src.size(), CV_8U);
     auto [x, y, w, h] = maskRegion;

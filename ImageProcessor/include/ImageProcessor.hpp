@@ -7,9 +7,11 @@
  * @version: 1.0
  * @email: caohengvs888@gmail.com
  */
+#include <optional>
 #include <string>
 #include <vector>
 #include "CommonDef/ExportDef.h"
+
 namespace cv
 {
 class Mat;
@@ -30,7 +32,7 @@ public:
     explicit ImageProcessor(const std::string& path);
     ~ImageProcessor();
 
-    bool processImage(const STMaskRegion& maskRegion);
+    std::optional<cv::Mat> processImage(const STMaskRegion& maskRegion);
     bool processImage();
     bool processImageByAI(const STMaskRegion& maskRegion);
 
