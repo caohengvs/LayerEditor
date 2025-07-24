@@ -96,6 +96,7 @@
         "forward_list": "cpp",
         "ranges": "cpp",
         "span": "cpp",
-        "stop_token": "cpp"
+        "stop_token": "cpp",
+        "qjsonobject": "cpp"
     } // Helps with older files
 }

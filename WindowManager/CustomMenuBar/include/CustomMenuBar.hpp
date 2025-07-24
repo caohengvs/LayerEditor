@@ -1,11 +1,15 @@
 #pragma once
 #include <QWidget>
-#include <QHBoxLayout> 
-#include <QPushButton> 
-#include <QLabel>     
+#include <QJsonArray>
+#include <QSignalMapper>
+#include <QMap>
+#include <functional>
+
+class QHBoxLayout;
+
 class CustomMenuBar : public QWidget
 {
-    Q_OBJECT 
+    Q_OBJECT
 
 public:
     explicit CustomMenuBar(QWidget* parent = nullptr);
@@ -13,17 +17,20 @@ public:
     ~CustomMenuBar();
 
 signals:
-    void importClicked();
-    void playAndPauseClicked();
+    void saveClicked();
     void removeClicked();
     void doneClicked();
 
 private slots:
-    void onImportButtonClicked();
-    void onPlayAndPauseButtonClicked();
+    void onSaveButtonClicked();
     void onRemoveButtonClicked();
     void onDoneButtonClicked();
+    
+private:
+    void setupUi();
+    bool readConfig(const QString&,  QJsonArray&);
 
 private:
-    QHBoxLayout* m_mainLayout; 
+    QHBoxLayout* m_mainLayout;
+    QMap<QString,std::function<void()>> m_actionMap;
 };

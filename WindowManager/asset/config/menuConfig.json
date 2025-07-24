@@ -1,0 +1,19 @@
+{
+    "btn": [
+        {
+            "icon": ":/icons/import.svg",
+            "tip": "save result",
+            "actionId": "101"
+        },
+        {
+            "icon": ":/icons/remove.svg",
+            "tip": "show selected",
+            "actionId": "102"
+        },
+        {
+            "icon": ":/icons/done.svg",
+            "tip": "done",
+            "actionId": "103"
+        }
+    ]
+}
