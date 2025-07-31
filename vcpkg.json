@@ -4,20 +4,23 @@
   "builtin-baseline": "0cb95c860ea83aafc1b24350510b30dec535989a",
   "description": "Third-party libraries for LayerEditor",
   "dependencies": [
+    "spdlog",
+    "gtest",
+    "opencv4",
+    "magic-enum"
+  ],
+  "overrides": [
     {
       "name": "spdlog",
-      "version>=": "1.15.3"
+      "version": "1.15.3"
     },
     {
       "name": "gtest",
-      "version>=": "1.13.0"
+      "version": "1.13.0"
     },
     {
       "name": "opencv4",
-      "version>=": "4.9.0"
-    },
-    {
-      "name": "magic-enum"
+      "version": "4.11.0"
     }
   ]
 }

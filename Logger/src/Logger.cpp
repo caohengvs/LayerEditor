@@ -2,11 +2,12 @@
 #include <spdlog/async.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/msvc_sink.h>
 #include <spdlog/spdlog.h>
 #include <sstream>
 #include <vector>
 
-struct Logger::LoggerImpl
+struct LoggerImpl
 {
     std::shared_ptr<spdlog::logger> logger_;
 
@@ -32,6 +33,12 @@ struct Logger::LoggerImpl
                 return spdlog::level::info;
         }
     }
+
+    LoggerImpl() = default;
+
+    ~LoggerImpl() = default;
+
+
 };
 
 Logger::Logger()
@@ -71,6 +78,7 @@ void Logger::init(const std::string& loggerName, Logger::LogLevel level, bool en
     if (enableConsole)
     {
         sinks.push_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
+        sinks.push_back(std::make_shared<spdlog::sinks::msvc_sink_mt>());
     }
     if (!filePath.empty())
     {
@@ -132,7 +140,7 @@ void Logger::initAsync(std::vector<spdlog::sink_ptr> sinks, const std::string& l
     pimpl_->logger_->flush_on(LoggerImpl::mapLogLevel(level));
 }
 
-struct Logger::LogStreamImpl
+struct LogStreamImpl
 {
     Logger::LogLevel level_;
     std::ostringstream ss_;
@@ -150,6 +158,7 @@ struct Logger::LogStreamImpl
         , func_(func)
     {
     }
+    ~LogStreamImpl() = default;
 };
 
 Logger::LogStream::LogStream(Logger::LogLevel level, LoggerImpl* loggerImpl, const char* file, int line,
@@ -163,7 +172,7 @@ Logger::LogStream::~LogStream()
     if (pimpl_ && pimpl_->logger_)
     {
         pimpl_->logger_->log({pimpl_->file_, pimpl_->line_, pimpl_->func_},
-                             Logger::LoggerImpl::mapLogLevel(pimpl_->level_), pimpl_->ss_.str());
+                             LoggerImpl::mapLogLevel(pimpl_->level_), pimpl_->ss_.str());
     }
 }
 

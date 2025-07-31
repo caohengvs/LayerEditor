@@ -10,10 +10,10 @@
  */
 
 #include <memory>
+#include <mutex>
 #include <ostream>
 #include <string>
 #include <vector>
-#include <mutex>
 #include "CommonDef/ExportDef.h"
 
 namespace spdlog
@@ -29,6 +29,10 @@ namespace level
 enum level_enum : int;
 }
 }  // namespace spdlog
+
+#pragma warning(push)
+#pragma warning(disable : 4251)  // Disable C4251 for the following code block
+struct LoggerImpl;
 
 class LIB_API Logger
 {
@@ -47,8 +51,9 @@ public:
     static Logger& getInstance();
     static void deleteInstance();
 
-    void init(const std::string& loggerName = "console", LogLevel level = INFO_L, bool enableConsole = true, bool isSync = false,
-              const std::string& filePath = "", size_t maxFileSize = 1048576 * 5, size_t maxFiles = 3);
+    void init(const std::string& loggerName = "console", LogLevel level = INFO_L, bool enableConsole = true,
+              bool isSync = false, const std::string& filePath = "", size_t maxFileSize = 1048576 * 5,
+              size_t maxFiles = 3);
 
     class LogStream;
 
@@ -60,9 +65,6 @@ public:
     LogStream error(const char* file, int line, const char* func);
     LogStream critical(const char* file, int line, const char* func);
 
-    Logger(const Logger&) = delete;
-    Logger& operator=(const Logger&) = delete;
-
 private:
     void initSync(std::vector<spdlog::sink_ptr>, const std::string&, LogLevel);
     void initAsync(std::vector<spdlog::sink_ptr>, const std::string&, LogLevel);
@@ -71,15 +73,20 @@ private:
     Logger();
     ~Logger();
 
-    struct LoggerImpl;
+    Logger(const Logger&) = delete;
+    Logger& operator=(const Logger&) = delete;
+
+    Logger(Logger&&) = delete;
+    Logger& operator=(Logger&&) = delete;
+
     std::unique_ptr<LoggerImpl> pimpl_;
     static inline Logger* m_pInstance = nullptr;
     static inline std::mutex m_mtxCreate;
 
-    struct LogStreamImpl;
     friend class LogStream;
 };
 
+struct LogStreamImpl;
 class LIB_API Logger::LogStream
 {
 public:
@@ -87,6 +94,11 @@ public:
               const char* func = nullptr);
 
     ~LogStream();
+
+    LogStream(const LogStream&) = delete;
+    LogStream& operator=(const LogStream&) = delete;
+    LogStream(LogStream&&) = delete;
+    LogStream& operator=(LogStream&&) = delete;
 
     template<typename T>
     LogStream& operator<<(const T& val);
@@ -98,6 +110,7 @@ public:
 private:
     std::unique_ptr<LogStreamImpl> pimpl_;
 };
+#pragma warning(pop)  // Re-enable C4251
 
 #define INIT_LOGGER(...) Logger::getInstance().init(__VA_ARGS__)
 #define DELETE_LOGGER(...) Logger::deleteInstance()

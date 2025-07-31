@@ -11,7 +11,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${OUTPUT_DIR}/${PROJECT_NAME}/lib
     OUTPUT_NAME "$<IF:$<CONFIG:Debug>,${PROJECT_NAME}d,${PROJECT_NAME}>")
 
-set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/installed/)
+set(CMAKE_INSTALL_PREFIX ${OUTPUT_DIR}/installed/)
 
 install(TARGETS ${PROJECT_NAME}
     EXPORT ${PROJECT_NAME}Targets
@@ -22,8 +22,13 @@ install(TARGETS ${PROJECT_NAME}
 )
 
 install(FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/interface/*.hpp
-    DESTINATION include/${PROJECT_NAME}
+    ${PROJECT_NAME}/include/*.hpp
+    DESTINATION ${PROJECT_NAME}/include/${PROJECT_NAME}
+)
+
+install(FILES
+    CommonDef/include/CommonDef/*.h
+    DESTINATION ${PROJECT_NAME}/include/CommonDef
 )
 
 install(EXPORT ${PROJECT_NAME}Targets
