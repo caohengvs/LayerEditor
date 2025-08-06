@@ -4,6 +4,7 @@
 #include <QSignalMapper>
 #include <QMap>
 #include <functional>
+#include <any>
 
 class QHBoxLayout;
 
@@ -20,18 +21,20 @@ signals:
     void saveClicked();
     void removeClicked();
     void doneClicked();
+    void rotateClicked(const int dir);
 
-private slots:
+private:
     void onSaveButtonClicked();
     void onRemoveButtonClicked();
     void onDoneButtonClicked();
+    void onRotateButtonClicked(const int dir);
     
 private:
     void setupUi();
-    bool readConfig(const QString&,  QJsonArray&);
-    void addAction(const QString& actionId, const std::function<void()>& action);
+    bool readConfig(const QString& config,  QJsonArray& outJson);
+    void addAction(const QString& actionId, const std::function<void(const std::vector<std::any>& args)>& action);
 
 private:
     QHBoxLayout* m_mainLayout;
-    QMap<QString,std::function<void()>> m_actionMap;
+    QMap<QString,std::function<void(const std::vector<std::any>&)>> m_actionMap;
 };

@@ -1,9 +1,16 @@
 {
     "btn": [
         {
-            "icon": ":/icons/import.svg",
-            "tip": "save result",
-            "actionId": "101"
+            "icon": ":/icons/clockwise.svg",
+            "tip": "顺时针90",
+            "actionId": "104",
+            "value": 90
+        },
+        {
+            "icon": ":/icons/counterclockwise.svg",
+            "tip": "逆时针90",
+            "actionId": "105",
+            "value": -90
         },
         {
             "icon": ":/icons/remove.svg",

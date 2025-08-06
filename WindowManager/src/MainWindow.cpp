@@ -1,13 +1,14 @@
 #include "MainWindow.hpp"
+#include <ImageProcessor.hpp>
 #include <QDebug>
 #include <QGuiApplication>
 #include <QScreen>
-#include <ImageProcessor.hpp>
 #include "CustomFileListWidget.hpp"
 #include "CustomMenuBar.hpp"
 #include "CustomScene.hpp"
 #include "CustomTitleBar.hpp"
 #include "CustomView.hpp"
+
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -43,13 +44,10 @@ void MainWindow::init()
     QWidget* centralWidget = new QWidget(this);
     m_customTitleBar = new CustomTitleBar(this, nullptr);
     CustomMenuBar* customMenuBar = new CustomMenuBar(centralWidget);
-    m_customFileList = new CustomFileListWidget(centralWidget);
-
     auto& [scene, view] = m_mainSceneAndView;
     scene = new CustomScene(centralWidget);
     view = new CustomView(scene, centralWidget);
 
-    m_customFileList->setFixedWidth(200);
     view->setMinimumSize(QSize(width() / 2, 400));
     scene->setSceneRect(0, 0, view->width(), view->height());
 
@@ -74,8 +72,8 @@ void MainWindow::init()
     mainLayout->addWidget(customMenuBar, rowCount + 1, 0, 1, 2);
 
     rowCount = mainLayout->rowCount();
-    mainLayout->addWidget(m_customFileList, rowCount + 1, 0);
-    mainLayout->addWidget(view, rowCount + 1, 1);
+    mainLayout->addWidget(view, rowCount + 1, 0, 1, 2);
+
     for (auto& itView : previewViews)
     {
         itView = new CustomView(previewScene, centralWidget);
@@ -89,21 +87,17 @@ void MainWindow::init()
 
     setCentralWidget(centralWidget);
 
-    connect(m_customFileList, &CustomFileListWidget::fileDoubleClicked, this,
-            [&scene](const auto& filePath) { 
-                scene->loadImage(filePath);
-            });
-
     connect(customMenuBar, &CustomMenuBar::removeClicked, this,
-            [&scene]() {
+            [&scene]()
+            {
                 static bool bShow = true;
                 scene->showSelectRect(bShow);
                 bShow = !bShow;
-            }   
-         );
-
-    connect(customMenuBar, &CustomMenuBar::doneClicked, this,
-            [&scene]() {
-                scene->processImage();
             });
+
+    connect(customMenuBar, &CustomMenuBar::doneClicked, this, [scene]() { scene->processImage(); });
+
+    connect(customMenuBar, &CustomMenuBar::rotateClicked, [view](const auto& val) { view->rotate(val); });
+
+    connect(view, &CustomView::filesDropped, this, [&scene](const auto& filePath) { scene->loadImage(filePath); });
 }

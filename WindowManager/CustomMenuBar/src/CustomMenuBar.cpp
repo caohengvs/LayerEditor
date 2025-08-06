@@ -11,9 +11,44 @@
 CustomMenuBar::CustomMenuBar(QWidget* parent)
     : QWidget(parent)
 {
-    addAction("101", [this]() { this->onSaveButtonClicked(); });
-    addAction("102", [this]() { this->onRemoveButtonClicked(); });
-    addAction("103", [this]() { this->onDoneButtonClicked(); });
+    addAction("101", [this](const auto& args) { this->onSaveButtonClicked(); });
+    addAction("102", [this](const auto& args) { this->onRemoveButtonClicked(); });
+    addAction("103", [this](const auto& args) { this->onDoneButtonClicked(); });
+    addAction("104",
+              [this](const auto& args)
+              {
+                  if (args.size() != 1)
+                  {
+                      return;
+                  }
+                  try
+                  {
+                      int val = std::any_cast<int>(args[0]);
+                      this->onRotateButtonClicked(val);
+                  }
+                  catch (const std::bad_any_cast& e)
+                  {
+                      qWarning() << "Error: Invalid argument types for 'print_info'. " << e.what();
+                  }
+              });
+
+    addAction("105",
+              [this](const auto& args)
+              {
+                  if (args.size() != 1)
+                  {
+                      return;
+                  }
+                  try
+                  {
+                      int val = std::any_cast<int>(args[0]);
+                      this->onRotateButtonClicked(val);
+                  }
+                  catch (const std::bad_any_cast& e)
+                  {
+                      qWarning() << "Error: Invalid argument types for 'print_info'. " << e.what();
+                  }
+              });
 
     setupUi();
 
@@ -31,7 +66,6 @@ CustomMenuBar::CustomMenuBar(QWidget* parent)
         QJsonObject btnObj = btn.toObject();
         QString iconPath = btnObj.value("icon").toString();
         QString toolTip = btnObj.value("tip").toString();
-        QString actionId = btnObj.value("actionId").toString();
 
         QPushButton* button = new QPushButton;
         QIcon icon(iconPath);
@@ -41,14 +75,24 @@ CustomMenuBar::CustomMenuBar(QWidget* parent)
         button->setToolTip(toolTip);
         m_mainLayout->addWidget(button);
         connect(button, &QPushButton::clicked, this,
-                [this, actionId]()
+                [this, btnObj]()
                 {
+                    const auto& actionId = btnObj.value("actionId").toString();
                     if (!m_actionMap.contains(actionId))
                     {
                         qWarning() << "CustomMenuBar: Action ID not found in action map:" << actionId;
                         return;
                     }
-                    m_actionMap[actionId]();
+
+                    if (btnObj.contains("value"))
+                    {
+                        const auto& val = btnObj.value("value").toInt();
+                        m_actionMap[actionId]({val});
+                    }
+                    else
+                    {
+                        m_actionMap[actionId]({});
+                    }
                 });
     }
 
@@ -72,6 +116,11 @@ void CustomMenuBar::onRemoveButtonClicked()
 void CustomMenuBar::onDoneButtonClicked()
 {
     emit doneClicked();
+}
+
+void CustomMenuBar::onRotateButtonClicked(int val)
+{
+    emit rotateClicked(val);
 }
 
 void CustomMenuBar::setupUi()
@@ -143,7 +192,8 @@ bool CustomMenuBar::readConfig(const QString& config, QJsonArray& outJson)
     return true;
 }
 
-void CustomMenuBar::addAction(const QString& actionId, const std::function<void()>& action)
+void CustomMenuBar::addAction(const QString& actionId,
+                              const std::function<void(const std::vector<std::any>& args)>& action)
 {
     m_actionMap[actionId] = action;
 }

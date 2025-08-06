@@ -1,5 +1,6 @@
 #include "CustomView.hpp"
 #include <QDebug>
+#include <QMimeData>
 #include <QOpenGLWidget>
 #include <QWheelEvent>
 
@@ -34,7 +35,7 @@ void CustomView::wheelEvent(QWheelEvent* event)
         event->accept();
         return;
     }
-    
+
     QPointF scenePos = mapToScene(event->pos());
 
     constexpr double scaleFactor = 1.15;
@@ -54,9 +55,41 @@ void CustomView::wheelEvent(QWheelEvent* event)
 void CustomView::resizeEvent(QResizeEvent* event)
 {
     QGraphicsView::resizeEvent(event);
-    if (scene()) {
+    if (scene())
+    {
         scene()->setSceneRect(QRectF(QPointF(0, 0), size()));
     }
+}
+
+void CustomView::dragEnterEvent(QDragEnterEvent* event)
+{
+    if (event->mimeData()->hasUrls() && event->mimeData()->urls().count() == 1)
+    {
+        event->acceptProposedAction();
+    }
+}
+
+void CustomView::dragMoveEvent(QDragMoveEvent* event)
+{
+    if (event->mimeData()->hasUrls() && event->mimeData()->urls().count() == 1)
+    {
+        event->acceptProposedAction();
+    }
+}
+
+void CustomView::dropEvent(QDropEvent* event)
+{
+    QList<QUrl> urls = event->mimeData()->urls();
+    if (urls.isEmpty())
+        return;
+
+    QString filePath;
+
+    filePath = urls.first().toLocalFile();
+
+    emit filesDropped(filePath);
+
+    event->acceptProposedAction();
 }
 
 void CustomView::init()
@@ -65,4 +98,6 @@ void CustomView::init()
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setStyleSheet("background-color: #333333;border: none;");
+    setAcceptDrops(true);
+
 }

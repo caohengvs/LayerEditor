@@ -32,8 +32,6 @@ public:
     explicit ImageProcessor(const std::string& path);
     ~ImageProcessor();
 
-    std::optional<cv::Mat> processImage(const STMaskRegion& maskRegion);
-    bool processImage();
     bool processImageByAI(const STMaskRegion& maskRegion);
 
 private:

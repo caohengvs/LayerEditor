@@ -9,7 +9,6 @@
 class CustomTitleBar;
 class CustomView; 
 class CustomScene;
-class CustomFileListWidget;
 
 class LIB_API MainWindow : public QMainWindow
 {
@@ -26,7 +25,6 @@ private:
 private:
     QPushButton* m_btnUpdate;
     CustomTitleBar* m_customTitleBar; 
-    CustomFileListWidget* m_customFileList;
     std::pair<CustomScene*, CustomView*> m_mainSceneAndView;
     std::pair<CustomScene*, std::array<CustomView*, 8>> m_previewSceneAndView;
 };

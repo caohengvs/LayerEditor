@@ -1,6 +1,7 @@
 #include "ImageProcessor.hpp"
 #include <onnxruntime_cxx_api.h>
 #include <filesystem>
+#include <fstream>
 #include <opencv2/opencv.hpp>
 #include "Logger.hpp"
 
@@ -13,133 +14,13 @@ ImageProcessor::~ImageProcessor()
 {
 }
 
-std::optional<cv::Mat> ImageProcessor::processImage(const STMaskRegion& maskRegion)
-{
-    cv::Mat src = cv::imread(m_strImgPath);
-
-    if (src.empty())
-    {
-        return std::nullopt;  
-    }
-
-    cv::Mat mask = cv::Mat::zeros(src.size(), CV_8U);
-
-    auto [x, y, w, h] = maskRegion;
-    cv::Rect watermark_roi(x, y, w, h);
-
-    cv::rectangle(mask, watermark_roi, cv::Scalar(255), -1);
-
-    cv::Mat repaired_img;
-    double inpaintRadius = 20;
-    int inpaintFlags = cv::INPAINT_NS;
-    cv::inpaint(src, mask, repaired_img, inpaintRadius, inpaintFlags);
-    cv::imshow("Repaired Image", repaired_img);
-    cv::waitKey(0);
-    return repaired_img;
-}
-
-bool ImageProcessor::processImage()
-{
-    cv::Mat src = cv::imread(m_strImgPath, cv::IMREAD_GRAYSCALE);
-    if (src.empty())
-    {
-        return false;
-    }
-
-    cv::Mat padded;
-    int m = cv::getOptimalDFTSize(src.rows);
-    int n = cv::getOptimalDFTSize(src.cols);
-
-    cv::copyMakeBorder(src, padded, 0, m - src.rows, 0, n - src.cols, cv::BORDER_CONSTANT, cv::Scalar::all(0));
-
-    cv::Mat float_padded;
-    padded.convertTo(float_padded, CV_32F);
-
-    std::vector<cv::Mat> planes;
-    planes.push_back(float_padded);
-    planes.push_back(cv::Mat::zeros(padded.size(), CV_32F));
-
-    cv::Mat complexI;
-    cv::merge(planes, complexI);
-
-    cv::dft(complexI, complexI);
-
-    fftshift(complexI, complexI);
-
-    cv::split(complexI, planes);
-
-    cv::Mat real_part = planes[0].clone();
-    cv::Mat imag_part = planes[1].clone();
-
-    cv::Mat magnitudeImage;
-    cv::magnitude(real_part, imag_part, magnitudeImage);
-
-    magnitudeImage += cv::Scalar::all(1);
-    cv::log(magnitudeImage, magnitudeImage);
-
-    cv::normalize(magnitudeImage, magnitudeImage, 0, 255, cv::NORM_MINMAX);
-    magnitudeImage.convertTo(magnitudeImage, CV_8U);
-
-    cv::imshow("Magnitude Spectrum (Identify Noise Spikes)", magnitudeImage);
-    std::cout << "Please identify the coordinates of noise spikes in the 'Magnitude Spectrum' window." << std::endl;
-    std::cout << "You will need to adjust the filter parameters in the code based on these locations." << std::endl;
-    cv::waitKey(0);
-
-    cv::Mat H = cv::Mat::ones(complexI.size(), CV_32F);
-
-    int notch_radius = 5;
-    auto funcSync = [](cv::Mat& inputOutput_H, cv::Point center, int radius)
-    {
-        cv::circle(inputOutput_H, center, radius, cv::Scalar(0), -1, 8);
-
-        cv::Point c2(center.x, inputOutput_H.rows - center.y);
-        cv::Point c3(inputOutput_H.cols - center.x, center.y);
-        cv::Point c4(inputOutput_H.cols - center.x, inputOutput_H.rows - center.y);
-
-        cv::circle(inputOutput_H, c2, radius, cv::Scalar(0), -1, 8);
-        cv::circle(inputOutput_H, c3, radius, cv::Scalar(0), -1, 8);
-        cv::circle(inputOutput_H, c4, radius, cv::Scalar(0), -1, 8);
-    };
-
-    funcSync(H, cv::Point(complexI.cols / 2 + 50, complexI.rows / 2 + 50), notch_radius);
-    funcSync(H, cv::Point(complexI.cols / 2 - 50, complexI.rows / 2 + 50), notch_radius);
-    funcSync(H, cv::Point(complexI.cols / 2 + 50, complexI.rows / 2 - 50), notch_radius);
-    funcSync(H, cv::Point(complexI.cols / 2 - 50, complexI.rows / 2 - 50), notch_radius);
-
-    cv::Mat H_shifted;
-    fftshift(H, H_shifted);
-
-    std::vector<cv::Mat> planesH;
-    planesH.push_back(H_shifted);
-    planesH.push_back(cv::Mat::zeros(H_shifted.size(), CV_32F));
-    cv::Mat complexH;
-    cv::merge(planesH, complexH);
-
-    cv::Mat complexIH;
-    cv::mulSpectrums(complexI, complexH, complexIH, 0);
-
-    cv::Mat restoredComplexI;
-
-    cv::idft(complexIH, restoredComplexI, cv::DFT_REAL_OUTPUT | cv::DFT_SCALE);
-
-    cv::Mat restoredImage;
-    restoredComplexI.convertTo(restoredImage, CV_8U);
-    cv::normalize(restoredImage, restoredImage, 0, 255, cv::NORM_MINMAX);
-
-    cv::imshow("Original Grayscale Image", src);
-    cv::imshow("Restored Image (Frequency Filtered)", restoredImage);
-
-    cv::waitKey(0);
-    return true;
-}
-
 bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
 {
     const int MODEL_INPUT_H = 512;
     const int MODEL_INPUT_W = 512;
-    const char* input_image_name = "image";     // 实际模型的图像输入名称
-    const char* input_mask_name = "mask";       // 实际模型的掩码输入名称
-    const char* output_result_name = "output";  // 实际模型的输出名称
+    const char* input_image_name = "image";     
+    const char* input_mask_name = "mask";       
+    const char* output_result_name = "output"; 
 
     Ort::Env env(ORT_LOGGING_LEVEL_FATAL, "LamaCleanerInference");
     Ort::SessionOptions session_options;
@@ -191,12 +72,6 @@ bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
         LOG_ERROR << "Failed to read image from path: " << m_strImgPath;
         return false;
     }
-    // cv::Mat src = processImage(maskRegion).value_or(cv::Mat());
-    // if(src.empty())
-    // {
-    //     LOG_ERROR << "Failed to read image from path: " << m_strImgPath;
-    //     return false;
-    // }
 
     cv::Mat mask = cv::Mat::zeros(src.size(), CV_8U);
     auto [x, y, w, h] = maskRegion;
@@ -252,7 +127,7 @@ bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
     }
 
     cv::cvtColor(output_image, output_image, cv::COLOR_RGB2BGR);
-    cv::resize(output_image, output_image, src.size(), 0, 0, cv::INTER_LINEAR);
+    cv::resize(output_image, output_image, src.size(), 0, 0, cv::INTER_LANCZOS4);
 
     cv::imshow("Processed Image", output_image);
     cv::waitKey(0);
@@ -288,14 +163,10 @@ std::vector<float> ImageProcessor::preprocess_image(const cv::Mat& img, int targ
     cv::Mat resized_img;
     cv::resize(img, resized_img, cv::Size(target_w, target_h), 0, 0, cv::INTER_AREA);
 
-    // OpenCV 默认是 BGR，ONNX 模型通常期望 RGB
     cv::cvtColor(resized_img, resized_img, cv::COLOR_BGR2RGB);
 
-    // 转换为 float 类型并归一化到 [-1, 1]
     resized_img.convertTo(resized_img, CV_32FC3, 1.0 / 255.0);
-    // resized_img.convertTo(resized_img, CV_32FC3, 1.0 / 127.5, -1.0);  // 归一化到 [-1, 1]
 
-    // HWC to CHW
     std::vector<float> data(1 * 3 * target_h * target_w);
     for (int c = 0; c < 3; ++c)
         for (int h = 0; h < target_h; ++h)
@@ -307,25 +178,21 @@ std::vector<float> ImageProcessor::preprocess_image(const cv::Mat& img, int targ
 std::vector<float> ImageProcessor::preprocess_mask(const cv::Mat& mask, int target_h, int target_w)
 {
     cv::Mat resized_mask;
-    cv::resize(mask, resized_mask, cv::Size(target_w, target_h), 0, 0, cv::INTER_NEAREST);  // 最近邻插值保持二值性
+    cv::resize(mask, resized_mask, cv::Size(target_w, target_h), 0, 0, cv::INTER_NEAREST);  
 
-    // 确保掩码是单通道灰度图
     if (resized_mask.channels() == 3)
     {
         cv::cvtColor(resized_mask, resized_mask, cv::COLOR_BGR2GRAY);
     }
 
-    // 二值化（如果不是纯黑白）并转换为 float 类型归一化到 [0, 1]
     cv::threshold(resized_mask, resized_mask, 128, 255, cv::THRESH_BINARY);
-    resized_mask.convertTo(resized_mask, CV_32FC1, 1.0 / 255.0);  // 正确归一化到[0,1]
+    resized_mask.convertTo(resized_mask, CV_32FC1, 1.0 / 255.0);  
 
-    // HWC (Height, Width, Channel) to CHW (Channel, Height, Width) - 掩码只有一个通道
-    std::vector<float> data(1 * 1 * target_h * target_w);  // Batch size 1, 1 channel
+    std::vector<float> data(1 * 1 * target_h * target_w);  
     for (int h = 0; h < target_h; ++h)
     {
         for (int w = 0; w < target_w; ++w)
         {
-            // data[0 * H * W + h * W + w]
             data[h * target_w + w] = resized_mask.at<float>(h, w);
         }
     }

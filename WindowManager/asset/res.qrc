@@ -7,5 +7,7 @@
     <file>pause.svg</file>
     <file>app.svg</file>
     <file>done.svg</file>
+    <file>counterclockwise.svg</file>
+    <file>clockwise.svg</file>
 </qresource>
 </RCC>

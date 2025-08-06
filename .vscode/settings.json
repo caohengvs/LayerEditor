@@ -97,6 +97,14 @@
         "ranges": "cpp",
         "span": "cpp",
         "stop_token": "cpp",
-        "qjsonobject": "cpp"
+        "qjsonobject": "cpp",
+        "bitset": "cpp",
+        "codecvt": "cpp",
+        "cstdarg": "cpp",
+        "expected": "cpp",
+        "fstream": "cpp",
+        "source_location": "cpp",
+        "typeindex": "cpp",
+        "unordered_set": "cpp"
     } // Helps with older files
 }
