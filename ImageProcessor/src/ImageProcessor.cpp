@@ -18,9 +18,9 @@ bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
 {
     const int MODEL_INPUT_H = 512;
     const int MODEL_INPUT_W = 512;
-    const char* input_image_name = "image";     
-    const char* input_mask_name = "mask";       
-    const char* output_result_name = "output"; 
+    const char* input_image_name = "image";
+    const char* input_mask_name = "mask";
+    const char* output_result_name = "output";
 
     Ort::Env env(ORT_LOGGING_LEVEL_FATAL, "LamaCleanerInference");
     Ort::SessionOptions session_options;
@@ -178,7 +178,7 @@ std::vector<float> ImageProcessor::preprocess_image(const cv::Mat& img, int targ
 std::vector<float> ImageProcessor::preprocess_mask(const cv::Mat& mask, int target_h, int target_w)
 {
     cv::Mat resized_mask;
-    cv::resize(mask, resized_mask, cv::Size(target_w, target_h), 0, 0, cv::INTER_NEAREST);  
+    cv::resize(mask, resized_mask, cv::Size(target_w, target_h), 0, 0, cv::INTER_NEAREST);
 
     if (resized_mask.channels() == 3)
     {
@@ -186,9 +186,9 @@ std::vector<float> ImageProcessor::preprocess_mask(const cv::Mat& mask, int targ
     }
 
     cv::threshold(resized_mask, resized_mask, 128, 255, cv::THRESH_BINARY);
-    resized_mask.convertTo(resized_mask, CV_32FC1, 1.0 / 255.0);  
+    resized_mask.convertTo(resized_mask, CV_32FC1, 1.0 / 255.0);
 
-    std::vector<float> data(1 * 1 * target_h * target_w);  
+    std::vector<float> data(1 * 1 * target_h * target_w);
     for (int h = 0; h < target_h; ++h)
     {
         for (int w = 0; w < target_w; ++w)

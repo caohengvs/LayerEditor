@@ -41,5 +41,3 @@ lib/
 
 # files
 UserConfig.cmake
-.clang-format
-
