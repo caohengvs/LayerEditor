@@ -39,3 +39,7 @@ lib/
 3rdparty/
 .vs/
 
+# files
+UserConfig.cmake
+.clang-format
+
