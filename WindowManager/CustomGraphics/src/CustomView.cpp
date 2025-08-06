@@ -1,5 +1,6 @@
 #include "CustomView.hpp"
 #include <QDebug>
+#include <QGraphicsTextItem>
 #include <QMimeData>
 #include <QOpenGLWidget>
 #include <QWheelEvent>
@@ -65,6 +66,7 @@ void CustomView::dragEnterEvent(QDragEnterEvent* event)
 {
     if (event->mimeData()->hasUrls() && event->mimeData()->urls().count() == 1)
     {
+        setStyleSheet("background-color: #1f7394ff;border: none");
         event->acceptProposedAction();
     }
 }
@@ -75,6 +77,11 @@ void CustomView::dragMoveEvent(QDragMoveEvent* event)
     {
         event->acceptProposedAction();
     }
+}
+
+void CustomView::dragLeaveEvent(QDragLeaveEvent* event)
+{
+    setStyleSheet("background-color: #333333;border: none;");
 }
 
 void CustomView::dropEvent(QDropEvent* event)
@@ -90,6 +97,7 @@ void CustomView::dropEvent(QDropEvent* event)
     emit filesDropped(filePath);
 
     event->acceptProposedAction();
+    setStyleSheet("background-color: #333333;border: none;");
 }
 
 void CustomView::init()
@@ -99,5 +107,4 @@ void CustomView::init()
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setStyleSheet("background-color: #333333;border: none;");
     setAcceptDrops(true);
-
 }
