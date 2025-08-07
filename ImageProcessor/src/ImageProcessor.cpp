@@ -1,12 +1,12 @@
 #include "ImageProcessor.hpp"
 #include <Windows.h>
 #include <onnxruntime_cxx_api.h>
-#include <windows.h>  // For MultiByteToWideChar
 #include <filesystem>
 #include <fstream>
 #include <opencv2/opencv.hpp>
 #include "Logger.hpp"
-
+#ifdef _WIN32
+#include <windows.h>  // For MultiByteToWideChar
 std::wstring Utf8ToWString(const std::string& utf8String)
 {
     if (utf8String.empty())
@@ -38,6 +38,7 @@ std::vector<char> readFileToBuffer(const std::string& path)
 
     return buffer;
 }
+#endif
 
 ImageProcessor::ImageProcessor(const std::string& path)
     : m_strImgPath(path)
@@ -98,7 +99,8 @@ bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
     {
         return false;
     }
-
+    cv::Mat src;
+#ifdef _WIN32
     std::vector<char> buffer = readFileToBuffer(m_strImgPath);
 
     if (buffer.empty())
@@ -107,13 +109,16 @@ bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
         return false;
     }
 
-    cv::Mat src = cv::imdecode(buffer, cv::IMREAD_COLOR);
+    src = cv::imdecode(buffer, cv::IMREAD_COLOR);
 
     if (src.empty())
     {
         LOG_ERROR << "Failed to read image from path: " << m_strImgPath;
         return false;
     }
+#else
+    src = cv::imread(m_strImgPath);
+#endif
 
     cv::Mat mask = cv::Mat::zeros(src.size(), CV_8U);
     auto [x, y, w, h] = maskRegion;
