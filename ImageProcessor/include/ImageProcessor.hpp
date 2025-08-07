@@ -35,8 +35,6 @@ public:
     bool processImageByAI(const STMaskRegion& maskRegion);
 
 private:
-    void fftshift(const cv::Mat& inputImg, cv::Mat& outputImg);
-
     std::vector<float> preprocess_image(const cv::Mat& img, int target_h, int target_w);
 
     std::vector<float> preprocess_mask(const cv::Mat& mask, int target_h, int target_w);

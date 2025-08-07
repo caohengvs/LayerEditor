@@ -123,7 +123,7 @@ const QRectF CustomScene::getSelectRect()
         qDebug() << "SelectRect or ImageItem not found in the scene.";
         return QRectF();
     }
-    
+
     // 由于是在缩放后的图像上进行选择，所以需要将在缩放后的选择矩形转换回原图像的坐标系
     qreal inverseScale = 1 / pImgItem->scale();
 

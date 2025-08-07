@@ -106,6 +106,7 @@
         "source_location": "cpp",
         "typeindex": "cpp",
         "unordered_set": "cpp",
-        "qgraphicstextitem": "cpp"
+        "qgraphicstextitem": "cpp",
+        "qtextcodec": "cpp"
     } // Helps with older files
 }

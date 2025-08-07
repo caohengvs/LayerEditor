@@ -1,10 +1,10 @@
 #include "CustomView.hpp"
+#include <CustomScene.hpp>
 #include <QDebug>
 #include <QFileInfo>
 #include <QGraphicsTextItem>
 #include <QMimeData>
 #include <QOpenGLWidget>
-#include <QTextCodec>
 #include <QWheelEvent>
 
 CustomView::CustomView(QWidget* parent)
@@ -96,13 +96,25 @@ void CustomView::dropEvent(QDropEvent* event)
 
     filePath = urls.first().toLocalFile();
 
-    // 打印一下，看看这次路径是否正确了
-    qDebug() << "Final file path路径: " << filePath;
-
     emit filesDropped(filePath);
 
     event->acceptProposedAction();
     setStyleSheet("background-color: #333333;border: none;");
+}
+
+void CustomView::rotate(qreal angle)
+{
+    auto* pScene = dynamic_cast<CustomScene*>(scene());
+    if (!pScene)
+        return;
+
+    auto* pItem = dynamic_cast<QGraphicsPixmapItem*>(pScene->getItem(CustomScene::ItemType::ImageItem));
+    if (!pItem)
+        return;
+
+    QGraphicsView::rotate(angle);
+
+    fitInView(pItem->sceneBoundingRect(), Qt::KeepAspectRatio);
 }
 
 void CustomView::init()

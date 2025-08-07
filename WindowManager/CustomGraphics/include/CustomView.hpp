@@ -20,6 +20,9 @@ public:
     explicit CustomView(QGraphicsScene* scene, QWidget* parent = nullptr);
     ~CustomView() override;
 
+public:
+    void rotate(qreal angle);
+
 private:
     void wheelEvent(QWheelEvent* event) override;
     void resizeEvent(QResizeEvent* event) override;

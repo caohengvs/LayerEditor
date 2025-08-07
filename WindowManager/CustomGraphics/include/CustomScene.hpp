@@ -6,9 +6,11 @@
 #include <RotatingRectItem.hpp>
 #include <unordered_map>
 #include <variant>
+class CustomView;
 
 class CustomScene final : public QGraphicsScene
 {
+    friend class CustomView;
     Q_OBJECT
 
     enum class ItemType

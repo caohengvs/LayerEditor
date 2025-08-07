@@ -7,6 +7,8 @@
 #include "Logger.hpp"
 #ifdef _WIN32
 #include <windows.h>  // For MultiByteToWideChar
+namespace
+{
 std::wstring Utf8ToWString(const std::string& utf8String)
 {
     if (utf8String.empty())
@@ -38,6 +40,7 @@ std::vector<char> readFileToBuffer(const std::string& path)
 
     return buffer;
 }
+}  // namespace
 #endif
 
 ImageProcessor::ImageProcessor(const std::string& path)
@@ -175,34 +178,13 @@ bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
 
     cv::cvtColor(output_image, output_image, cv::COLOR_RGB2BGR);
     cv::resize(output_image, output_image, src.size(), 0, 0, cv::INTER_LANCZOS4);
+    // cv::imshow("output", output_image);
+    // cv::waitKey(-1);
+    // cv::destroyAllWindows();
 
-    cv::imshow("Processed Image", output_image);
-    cv::waitKey(0);
-    cv::destroyAllWindows();
-    // cv::imwrite("output_image.png", output_image);
+    cv::imwrite("output.png",output_image);
 
     return true;
-}
-
-void ImageProcessor::fftshift(const cv::Mat& inputImg, cv::Mat& outputImg)
-{
-    outputImg = inputImg.clone();
-    int cx = outputImg.cols / 2;
-    int cy = outputImg.rows / 2;
-
-    cv::Mat q0(outputImg, cv::Rect(0, 0, cx, cy));    // Top-Left
-    cv::Mat q1(outputImg, cv::Rect(cx, 0, cx, cy));   // Top-Right
-    cv::Mat q2(outputImg, cv::Rect(0, cy, cx, cy));   // Bottom-Left
-    cv::Mat q3(outputImg, cv::Rect(cx, cy, cx, cy));  // Bottom-Right
-
-    cv::Mat tmp;
-    q0.copyTo(tmp);
-    q3.copyTo(q0);
-    tmp.copyTo(q3);
-
-    q1.copyTo(tmp);
-    q2.copyTo(q1);
-    tmp.copyTo(q2);
 }
 
 std::vector<float> ImageProcessor::preprocess_image(const cv::Mat& img, int target_h, int target_w)

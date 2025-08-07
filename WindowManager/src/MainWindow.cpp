@@ -9,7 +9,6 @@
 #include "CustomTitleBar.hpp"
 #include "CustomView.hpp"
 
-
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , m_customTitleBar(nullptr)
@@ -97,7 +96,11 @@ void MainWindow::init()
 
     connect(customMenuBar, &CustomMenuBar::doneClicked, this, [scene]() { scene->processImage(); });
 
-    connect(customMenuBar, &CustomMenuBar::rotateClicked, [view](const auto& val) { view->rotate(val); });
+    connect(customMenuBar, &CustomMenuBar::rotateClicked,
+            [view, scene](const auto& val)
+            {
+                view->rotate(val);
+            });
 
-    connect(view, &CustomView::filesDropped, this, [&scene](const auto& filePath) { scene->loadImage(filePath); });
+    connect(view, &CustomView::filesDropped, this, [scene](const auto& filePath) { scene->loadImage(filePath); });
 }
