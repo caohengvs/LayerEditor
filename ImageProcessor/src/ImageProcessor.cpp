@@ -1,9 +1,43 @@
 #include "ImageProcessor.hpp"
+#include <Windows.h>
 #include <onnxruntime_cxx_api.h>
+#include <windows.h>  // For MultiByteToWideChar
 #include <filesystem>
 #include <fstream>
 #include <opencv2/opencv.hpp>
 #include "Logger.hpp"
+
+std::wstring Utf8ToWString(const std::string& utf8String)
+{
+    if (utf8String.empty())
+    {
+        return std::wstring();
+    }
+    int sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, &utf8String[0], (int)utf8String.size(), NULL, 0);
+    std::wstring wstrTo(sizeNeeded, 0);
+    MultiByteToWideChar(CP_UTF8, 0, &utf8String[0], (int)utf8String.size(), &wstrTo[0], sizeNeeded);
+    return wstrTo;
+}
+
+std::vector<char> readFileToBuffer(const std::string& path)
+{
+    std::wstring wpath = Utf8ToWString(path);
+
+    std::ifstream file(wpath, std::ios::binary);
+    if (!file.is_open())
+    {
+        return {};
+    }
+
+    file.seekg(0, std::ios::end);
+    std::streamsize fileSize = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    std::vector<char> buffer(fileSize);
+    file.read(buffer.data(), fileSize);
+
+    return buffer;
+}
 
 ImageProcessor::ImageProcessor(const std::string& path)
     : m_strImgPath(path)
@@ -65,7 +99,15 @@ bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
         return false;
     }
 
-    cv::Mat src = cv::imread(m_strImgPath);
+    std::vector<char> buffer = readFileToBuffer(m_strImgPath);
+
+    if (buffer.empty())
+    {
+        LOG_ERROR << "无法读取文件到内存: " << m_strImgPath << std::endl;
+        return false;
+    }
+
+    cv::Mat src = cv::imdecode(buffer, cv::IMREAD_COLOR);
 
     if (src.empty())
     {

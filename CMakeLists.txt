@@ -22,7 +22,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 project(LayerEditor VERSION 0.1.0 LANGUAGES C CXX)
 
-
 find_package(Qt5 COMPONENTS Widgets Core Gui REQUIRED)
 
 include_directories(
@@ -59,7 +58,7 @@ if(WIN32)
     find_program(WINDEPLOYQT_EXECUTABLE NAMES windeployqt PATHS ${Qt5_ROOT}/bin)
 
     if(WINDEPLOYQT_EXECUTABLE)
-        message(STATUS "找到 windeployqt: ${WINDEPLOYQT_EXECUTABLE}")
+        message(STATUS "find windeployqt: ${WINDEPLOYQT_EXECUTABLE}")
         add_custom_command(
             TARGET ${PROJECT_NAME}# 关联到你的可执行文件目标
             POST_BUILD                    # 在目标构建完成后运行
