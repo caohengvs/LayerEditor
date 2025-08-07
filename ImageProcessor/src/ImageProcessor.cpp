@@ -123,16 +123,38 @@ bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
     src = cv::imread(m_strImgPath);
 #endif
 
-    cv::Mat mask = cv::Mat::zeros(src.size(), CV_8U);
-    auto [x, y, w, h] = maskRegion;
-    cv::Rect watermark_roi(x, y, w, h);
-    cv::rectangle(mask, watermark_roi, cv::Scalar(255), -1);
+      // --- Smart Cropping Logic Start ---
+    int padding = 64; 
+    int x = std::max(0, maskRegion.x - padding);
+    int y = std::max(0, maskRegion.y - padding);
+    int w = maskRegion.w + 2 * padding;
+    int h = maskRegion.h + 2 * padding;
 
-    std::vector<float> input_image_data = preprocess_image(src, MODEL_INPUT_H, MODEL_INPUT_W);
-    std::vector<float> input_mask_data = preprocess_mask(mask, MODEL_INPUT_H, MODEL_INPUT_W);
+    // Adjust cropping rect to not exceed image boundaries
+    x = std::min(x, src.cols - 1);
+    y = std::min(y, src.rows - 1);
+    w = std::min(w, src.cols - x);
+    h = std::min(h, src.rows - y);
+
+    cv::Rect roi(x, y, w, h);
+    cv::Mat cropped_src = src(roi).clone();
+
+    // Create a mask for the cropped area
+    cv::Mat cropped_mask = cv::Mat::zeros(cropped_src.size(), CV_8U);
+    cv::Rect mask_roi_in_cropped_img(maskRegion.x - x, maskRegion.y - y, maskRegion.w, maskRegion.h);
+    cv::rectangle(cropped_mask, mask_roi_in_cropped_img, cv::Scalar(255), -1);
+
+    // Resize cropped image and mask to model input size
+    cv::Mat resized_src, resized_mask;
+    cv::resize(cropped_src, resized_src, cv::Size(MODEL_INPUT_W, MODEL_INPUT_H), 0, 0, cv::INTER_AREA);
+    cv::resize(cropped_mask, resized_mask, cv::Size(MODEL_INPUT_W, MODEL_INPUT_H), 0, 0, cv::INTER_NEAREST);
+    // --- Smart Cropping Logic End ---
+
+    std::vector<float> input_image_data = preprocess_image(resized_src, MODEL_INPUT_H, MODEL_INPUT_W);
+    std::vector<float> input_mask_data = preprocess_mask(resized_mask, MODEL_INPUT_H, MODEL_INPUT_W);
 
     std::vector<int64_t> image_input_shape = {1, 3, MODEL_INPUT_H, MODEL_INPUT_W};
-    std::vector<int64_t> mask_input_shape = {1, 1, MODEL_INPUT_H, MODEL_INPUT_W};  // 掩码是单通道
+    std::vector<int64_t> mask_input_shape = {1, 1, MODEL_INPUT_H, MODEL_INPUT_W};
 
     Ort::MemoryInfo memory_info =
         Ort::MemoryInfo::CreateCpu(OrtAllocatorType::OrtArenaAllocator, OrtMemType::OrtMemTypeDefault);
@@ -166,23 +188,29 @@ bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
     cv::Mat output_image(out_h, out_w, CV_8UC3);
     for (int c = 0; c < out_c; ++c)
     {
-        for (int h = 0; h < out_h; ++h)
+        for (int h_idx = 0; h_idx < out_h; ++h_idx)
         {
-            for (int w = 0; w < out_w; ++w)
+            for (int w_idx = 0; w_idx < out_w; ++w_idx)
             {
-                output_image.at<cv::Vec3b>(h, w)[c] =
-                    static_cast<unsigned char>(output_data[c * out_h * out_w + h * out_w + w]);
+                output_image.at<cv::Vec3b>(h_idx, w_idx)[c] =
+                    static_cast<unsigned char>(output_data[c * out_h * out_w + h_idx * out_w + w_idx]);
             }
         }
     }
 
     cv::cvtColor(output_image, output_image, cv::COLOR_RGB2BGR);
-    cv::resize(output_image, output_image, src.size(), 0, 0, cv::INTER_LANCZOS4);
-    // cv::imshow("output", output_image);
-    // cv::waitKey(-1);
-    // cv::destroyAllWindows();
 
-    cv::imwrite("output.png",output_image);
+    // --- Post-processing and Splicing ---
+    // Resize the output back to the cropped image's original size
+    cv::resize(output_image, output_image, cropped_src.size(), 0, 0, cv::INTER_LANCZOS4);
+
+    // Apply the restored region back to the original source image
+    cv::Mat final_mask = cv::Mat::zeros(src.size(), CV_8U);
+    cv::rectangle(final_mask, cv::Rect(maskRegion.x, maskRegion.y, maskRegion.w, maskRegion.h), cv::Scalar(255), -1);
+
+    output_image.copyTo(src(roi), cropped_mask);
+
+    cv::imwrite("output.png", src);
 
     return true;
 }
