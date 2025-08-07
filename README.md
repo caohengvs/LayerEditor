@@ -43,8 +43,8 @@ cmake --build build --config Release
 ```
 LayerEditor/
 ├── Logger/           # 日志库模块（封装spdlog）
-│   ├── include/      # 头文件（如CLogger.hpp、ILogger.hpp等）
-│   ├── src/          # 源文件（如CLogger.cpp）
+│   ├── include/      
+│   ├── src/          
 │   └── CMakeLists.txt
 ├── WindowManager/    # 窗口管理模块
 │   ├── include/
@@ -64,10 +64,12 @@ LayerEditor/
 ## ⚙️ Configuration
 
 ### CMake Options
-
+在根目录下，创建UserConfig.cmake.配置自定义环境路径:
 ```cmake
-set(CMAKE_TOOLCHAIN_FILE "your vcpkg installed path/vcpkg.cmake")
-set(VCPKG_TARGET_TRIPLET "x64-windows")
+set(Qt5_ROOT "D:/Qt/5.12.12/msvc2017_64")
+set(3rd_PARTY_ROOT "D:/repos/3rdParty")
+set(CMAKE_TOOLCHAIN_FILE "D:/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "vcpkg toolchain file")
+set(VCPKG_TARGET_TRIPLET "x64-windows" CACHE STRING "")
 ```
 
 ## 📈 Performance
