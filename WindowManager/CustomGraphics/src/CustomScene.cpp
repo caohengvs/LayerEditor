@@ -85,6 +85,7 @@ bool CustomScene::processImage()
         {
             qDebug() << "Rotation animation finished.";
             hide();
+            show(ItemType::SelectRect);
             if (stInfo != std::nullopt)
             {
                 QImage image(reinterpret_cast<uchar*>(stInfo.value().buffer.get()), stInfo.value().cols,
