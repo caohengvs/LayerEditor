@@ -94,7 +94,9 @@ void MainWindow::init()
                 bShow = !bShow;
             });
 
-    connect(customMenuBar, &CustomMenuBar::doneClicked, this, [scene]() { scene->processImage(); });
+    connect(customMenuBar, &CustomMenuBar::doneClicked, this, [scene]() { 
+        scene->processImage();
+     });
 
     connect(customMenuBar, &CustomMenuBar::rotateClicked,
             [view, scene](const auto& val)
@@ -103,4 +105,6 @@ void MainWindow::init()
             });
 
     connect(view, &CustomView::filesDropped, this, [scene](const auto& filePath) { scene->loadImage(filePath); });
+
+     connect(customMenuBar, &CustomMenuBar::showOriginalImg, this, [scene]() { scene->showOriginalImg(); });
 }

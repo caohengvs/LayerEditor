@@ -1,5 +1,5 @@
 #include "CustomScene.hpp"
-#include <ImageProcessor.hpp>
+
 #include <QDebug>
 #include <QGraphicsPixmapItem>
 #include <ResizableRectItem.hpp>
@@ -42,15 +42,7 @@ bool CustomScene::loadImage(const QString& filePath)
         qDebug() << "Failed to load image from" << filePath;
         return false;
     }
-    QRectF sceneRect = this->sceneRect();
-    QPixmap pix = pItem->pixmap();
-    qreal scaleX = sceneRect.width() / pix.width();
-    qreal scaleY = sceneRect.height() / pix.height();
-    qreal scale = qMin(scaleX, scaleY);  // 保持比例
-    pItem->setScale(scale);
-    qreal x = sceneRect.center().x() - (pix.width() * scale) / 2.0;
-    qreal y = sceneRect.center().y() - (pix.height() * scale) / 2.0;
-    pItem->setPos(x, y);
+    adjustImg(pItem);
     addItem(ItemType::ImageItem, std::pair<QString, QGraphicsItem*>(filePath, pItem));
     qDebug() << magic_enum::enum_name(ItemType::ImageItem).data() << "loaded successfully from" << filePath;
 
@@ -78,9 +70,12 @@ bool CustomScene::processImage()
             hide();
             show(ItemType::RotatingRectItem);
             qDebug() << "Rotation animation start.";
+
             ImageProcessor imageProcessor(path.toStdString());
             imageProcessor.processImageByAI({static_cast<int>(rc.x()), static_cast<int>(rc.y()),
                                              static_cast<int>(rc.width()), static_cast<int>(rc.height())});
+
+            stInfo = imageProcessor.getImageInfo();
         },
         1000);
 
@@ -90,8 +85,18 @@ bool CustomScene::processImage()
         {
             qDebug() << "Rotation animation finished.";
             hide();
-            show(ItemType::ImageItem);
-            show(ItemType::SelectRect);
+            // show(ItemType::ImageItem);
+            if (stInfo != std::nullopt)
+            {
+                QImage image(reinterpret_cast<uchar*>(stInfo.value().buffer.get()), stInfo.value().cols,
+                             stInfo.value().rows, stInfo.value().step, QImage::Format_RGB888);
+
+                QPixmap pixmap = QPixmap::fromImage(image);
+                auto* pItem = new QGraphicsPixmapItem(pixmap);
+                adjustImg(pItem);
+                addItem(ItemType::OutImageItem, pItem);
+            }
+
             remove(ItemType::RotatingRectItem);
         },
         Qt::QueuedConnection);
@@ -111,6 +116,14 @@ void CustomScene::showSelectRect(bool bShow)
 
     show(ItemType::SelectRect, bShow);
     setTop(ItemType::SelectRect);
+}
+
+void CustomScene::showOriginalImg()
+{
+    static bool flag = true;
+    show(ItemType::ImageItem, flag);
+    show(ItemType::OutImageItem, !flag);
+    flag = !flag;
 }
 
 const QRectF CustomScene::getSelectRect()
@@ -256,4 +269,17 @@ void CustomScene::addItem(ItemType type, const ItemValue& val)
         val);
 
     m_itemMap.insert_or_assign(type, val);
+}
+
+void CustomScene::adjustImg(QGraphicsPixmapItem* item)
+{
+    QRectF sceneRect = this->sceneRect();
+    QPixmap pix = item->pixmap();
+    qreal scaleX = sceneRect.width() / pix.width();
+    qreal scaleY = sceneRect.height() / pix.height();
+    qreal scale = qMin(scaleX, scaleY);
+    item->setScale(scale);
+    qreal x = sceneRect.center().x() - (pix.width() * scale) / 2.0;
+    qreal y = sceneRect.center().y() - (pix.height() * scale) / 2.0;
+    item->setPos(x, y);
 }

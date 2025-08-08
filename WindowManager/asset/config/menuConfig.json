@@ -21,6 +21,12 @@
             "icon": ":/icons/done.svg",
             "tip": "done",
             "actionId": "103"
+        },
+        {
+            "icon": ":/icons/original.svg",
+            "state": ":/icons/hideOriginal.svg",
+            "tip": "原图(显示/隐藏)",
+            "actionId": "106"
         }
     ]
 }

@@ -22,12 +22,14 @@ signals:
     void removeClicked();
     void doneClicked();
     void rotateClicked(const int dir);
+    void showOriginalImg();
 
 private:
     void onSaveButtonClicked();
     void onRemoveButtonClicked();
     void onDoneButtonClicked();
     void onRotateButtonClicked(const int dir);
+    void onShowOriginalImg();
     
 private:
     void setupUi();

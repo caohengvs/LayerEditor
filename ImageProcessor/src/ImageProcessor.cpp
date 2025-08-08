@@ -3,8 +3,10 @@
 #include <onnxruntime_cxx_api.h>
 #include <filesystem>
 #include <fstream>
+#include <magic_enum/magic_enum.hpp>
 #include <opencv2/opencv.hpp>
 #include "Logger.hpp"
+
 #ifdef _WIN32
 #include <windows.h>  // For MultiByteToWideChar
 namespace
@@ -123,8 +125,10 @@ bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
     src = cv::imread(m_strImgPath);
 #endif
 
-      // --- Smart Cropping Logic Start ---
-    int padding = 64; 
+    m_srcMat = std::make_unique<cv::Mat>(src);
+
+    // --- Smart Cropping Logic Start ---
+    int padding = 64;
     int x = std::max(0, maskRegion.x - padding);
     int y = std::max(0, maskRegion.y - padding);
     int w = maskRegion.w + 2 * padding;
@@ -210,9 +214,62 @@ bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
 
     output_image.copyTo(src(roi), cropped_mask);
 
-    cv::imwrite("output.png", src);
+    m_outMat = std::make_unique<cv::Mat>(std::move(src));
 
     return true;
+}
+
+bool ImageProcessor::save(const std::string& path)
+{
+    if (!m_outMat)
+    {
+        return false;
+    }
+
+    cv::imwrite(path, *m_outMat.get());
+
+    return true;
+}
+
+bool ImageProcessor::showTest()
+{
+    if (!m_outMat)
+    {
+        return false;
+    }
+
+    cv::imshow("outTest", *m_outMat.get());
+    cv::waitKey(-1);
+    cv::destroyAllWindows();
+
+    return true;
+}
+
+std::optional<ImageProcessor::STImageInfo> ImageProcessor::getImageInfo()
+{
+    if(!m_outMat)
+    {
+        return std::nullopt;
+    }
+    cv::Mat rgb;
+    cv::cvtColor(*m_outMat, rgb, cv::COLOR_BGR2RGB);
+    STImageInfo stImg;
+
+    size_t bufferSize = m_outMat->total() * m_outMat->elemSize();
+
+    stImg.buffer.reset(new (std::nothrow) unsigned char[bufferSize]);
+    if (!stImg.buffer)
+    {
+        return stImg;
+    }
+
+    memcpy_s(stImg.buffer.get(), bufferSize, rgb.data, bufferSize);
+
+    stImg.cols = m_outMat->cols;
+    stImg.rows = m_outMat->rows;
+    stImg.step = m_outMat->step;
+
+    return std::move(stImg);
 }
 
 std::vector<float> ImageProcessor::preprocess_image(const cv::Mat& img, int target_h, int target_w)

@@ -50,6 +50,12 @@ CustomMenuBar::CustomMenuBar(QWidget* parent)
                   }
               });
 
+    addAction("106",
+              [this](const auto& args)
+              {
+                 this->onShowOriginalImg();
+              });
+
     setupUi();
 
     QJsonArray btnConfig;
@@ -121,6 +127,11 @@ void CustomMenuBar::onDoneButtonClicked()
 void CustomMenuBar::onRotateButtonClicked(int val)
 {
     emit rotateClicked(val);
+}
+
+void CustomMenuBar::onShowOriginalImg()
+{
+    emit showOriginalImg();
 }
 
 void CustomMenuBar::setupUi()

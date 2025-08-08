@@ -9,5 +9,7 @@
     <file>done.svg</file>
     <file>counterclockwise.svg</file>
     <file>clockwise.svg</file>
+    <file>original.svg</file>
+    <file>hideOriginal.svg</file>
 </qresource>
 </RCC>

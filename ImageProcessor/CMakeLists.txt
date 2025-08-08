@@ -9,6 +9,7 @@ set(onnxruntime_ROOT ${3rd_PARTY_ROOT}/onnxruntime-win-x64-1.21.0)
 file(GLOB SOURCES "src/*.cpp" "include/*.hpp")
 
 find_package(OpenCV REQUIRED)
+find_package(magic_enum CONFIG REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED
     ${SOURCES}
@@ -23,6 +24,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE "$<IF:$<CONFIG:Debug>,Loggerd,Logger>"
     PRIVATE ${OpenCV_LIBS}
     PRIVATE onnxruntime
+    PRIVATE magic_enum::magic_enum
 ) 
 
 target_include_directories(${PROJECT_NAME} PRIVATE
