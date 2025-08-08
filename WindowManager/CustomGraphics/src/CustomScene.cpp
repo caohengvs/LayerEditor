@@ -63,9 +63,8 @@ bool CustomScene::processImage()
 
     auto* pItem = new RotatingRectItem(getCenter(QSizeF(50, 50)));
     addItem(ItemType::RotatingRectItem, pItem);
-    std::optional<ImageProcessor::STImageInfo> stInfo = std::nullopt;
     pItem->startRotationAnimation(
-        [this, rc, path, &stInfo]()
+        [this, rc, path]()
         {
             hide();
             show(ItemType::RotatingRectItem);
@@ -75,28 +74,28 @@ bool CustomScene::processImage()
             imageProcessor.processImageByAI({static_cast<int>(rc.x()), static_cast<int>(rc.y()),
                                              static_cast<int>(rc.width()), static_cast<int>(rc.height())});
 
-            stInfo = imageProcessor.getImageInfo();
+            m_stInfo = imageProcessor.getImageInfo();
         },
         1000);
 
     connect(
         pItem, &RotatingRectItem::finished, this,
-        [this,&stInfo]()
+        [this]()
         {
             qDebug() << "Rotation animation finished.";
             hide();
-            show(ItemType::SelectRect);
-            if (stInfo != std::nullopt)
+
+            if (m_stInfo != std::nullopt)
             {
-                QImage image(reinterpret_cast<uchar*>(stInfo.value().buffer.get()), stInfo.value().cols,
-                             stInfo.value().rows, stInfo.value().step, QImage::Format_RGB888);
+                QImage image(reinterpret_cast<uchar*>(m_stInfo.value().buffer.get()), m_stInfo.value().cols,
+                             m_stInfo.value().rows, m_stInfo.value().step, QImage::Format_RGB888);
 
                 QPixmap pixmap = QPixmap::fromImage(image);
                 auto* pItem = new QGraphicsPixmapItem(pixmap);
                 adjustImg(pItem);
                 addItem(ItemType::OutImageItem, pItem);
             }
-
+            showSelectRect(true);
             remove(ItemType::RotatingRectItem);
         },
         Qt::QueuedConnection);

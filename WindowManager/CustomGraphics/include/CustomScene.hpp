@@ -53,4 +53,5 @@ private:
 
 private:
     ItemMap m_itemMap;  
+    std::optional<ImageProcessor::STImageInfo> m_stInfo = std::nullopt;
 };
