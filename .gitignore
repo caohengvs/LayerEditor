@@ -38,6 +38,7 @@ build/
 lib/
 3rdparty/
 .vs/
+models/
 
 # files
 UserConfig.cmake
