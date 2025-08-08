@@ -63,9 +63,9 @@ bool CustomScene::processImage()
 
     auto* pItem = new RotatingRectItem(getCenter(QSizeF(50, 50)));
     addItem(ItemType::RotatingRectItem, pItem);
-
+    std::optional<ImageProcessor::STImageInfo> stInfo = std::nullopt;
     pItem->startRotationAnimation(
-        [this, rc, path]()
+        [this, rc, path, &stInfo]()
         {
             hide();
             show(ItemType::RotatingRectItem);
@@ -81,7 +81,7 @@ bool CustomScene::processImage()
 
     connect(
         pItem, &RotatingRectItem::finished, this,
-        [this]()
+        [this,&stInfo]()
         {
             qDebug() << "Rotation animation finished.";
             hide();

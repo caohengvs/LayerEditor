@@ -52,6 +52,5 @@ private:
     void adjustImg(QGraphicsPixmapItem* item);
 
 private:
-    ItemMap m_itemMap;  // Map to store items by type
-    std::optional<ImageProcessor::STImageInfo> stInfo = std::nullopt;
+    ItemMap m_itemMap;  
 };

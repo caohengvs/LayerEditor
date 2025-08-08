@@ -37,4 +37,4 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 include(${CMAKE_ROOT_DIR}/ProjectConfig.cmake)
 
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/ProjectTestConfig.cmake)
+# include(${CMAKE_CURRENT_SOURCE_DIR}/ProjectTestConfig.cmake)
