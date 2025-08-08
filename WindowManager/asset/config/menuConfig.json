@@ -24,7 +24,8 @@
         },
         {
             "icon": ":/icons/original.svg",
-            "state": ":/icons/hideOriginal.svg",
+            "icon_off": ":/icons/hideOriginal.svg",
+            "state":true,
             "tip": "原图(显示/隐藏)",
             "actionId": "106"
         }

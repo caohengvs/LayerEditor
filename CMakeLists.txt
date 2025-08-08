@@ -33,7 +33,7 @@ include_directories(
 add_subdirectory(Logger)
 add_subdirectory(WindowManager)
 add_subdirectory(ImageProcessor)
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME} WIN32 main.cpp)
 
 target_link_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/Logger/lib

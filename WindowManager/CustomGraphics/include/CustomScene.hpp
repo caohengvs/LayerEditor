@@ -36,7 +36,7 @@ public:
     bool loadImage(const QString& filePath);
     bool processImage();
     void showSelectRect(bool bShow = true);
-    void showOriginalImg();
+    void showOriginalImg(const bool visible);
 
 private:
     const QRectF getSelectRect();

@@ -85,7 +85,6 @@ bool CustomScene::processImage()
         {
             qDebug() << "Rotation animation finished.";
             hide();
-            // show(ItemType::ImageItem);
             if (stInfo != std::nullopt)
             {
                 QImage image(reinterpret_cast<uchar*>(stInfo.value().buffer.get()), stInfo.value().cols,
@@ -118,12 +117,10 @@ void CustomScene::showSelectRect(bool bShow)
     setTop(ItemType::SelectRect);
 }
 
-void CustomScene::showOriginalImg()
+void CustomScene::showOriginalImg(const bool visible)
 {
-    static bool flag = true;
-    show(ItemType::ImageItem, flag);
-    show(ItemType::OutImageItem, !flag);
-    flag = !flag;
+    show(ItemType::ImageItem, visible);
+    show(ItemType::OutImageItem, !visible);
 }
 
 const QRectF CustomScene::getSelectRect()

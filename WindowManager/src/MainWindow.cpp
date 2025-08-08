@@ -99,12 +99,12 @@ void MainWindow::init()
      });
 
     connect(customMenuBar, &CustomMenuBar::rotateClicked,
-            [view, scene](const auto& val)
+            [view, scene](const auto val)
             {
                 view->rotate(val);
             });
 
     connect(view, &CustomView::filesDropped, this, [scene](const auto& filePath) { scene->loadImage(filePath); });
 
-     connect(customMenuBar, &CustomMenuBar::showOriginalImg, this, [scene]() { scene->showOriginalImg(); });
+     connect(customMenuBar, &CustomMenuBar::showOriginalImg, this, [scene](const auto val) { scene->showOriginalImg(val); });
 }

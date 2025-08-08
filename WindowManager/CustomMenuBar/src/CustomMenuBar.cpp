@@ -53,7 +53,19 @@ CustomMenuBar::CustomMenuBar(QWidget* parent)
     addAction("106",
               [this](const auto& args)
               {
-                 this->onShowOriginalImg();
+                  if (args.size() != 1)
+                  {
+                      return;
+                  }
+                  try
+                  {
+                      bool val = std::any_cast<bool>(args[0]);
+                      this->onShowOriginalImg(val);
+                  }
+                  catch (const std::bad_any_cast& e)
+                  {
+                      qWarning() << "Error: Invalid argument types for 'print_info'. " << e.what();
+                  }
               });
 
     setupUi();
@@ -70,18 +82,26 @@ CustomMenuBar::CustomMenuBar(QWidget* parent)
         }
 
         QJsonObject btnObj = btn.toObject();
+        QString iconOff;
         QString iconPath = btnObj.value("icon").toString();
         QString toolTip = btnObj.value("tip").toString();
 
         QPushButton* button = new QPushButton;
-        QIcon icon(iconPath);
+        QIcon icon;
+        icon.addFile(iconPath, QSize(), QIcon::Normal, QIcon::On);
+        if (btnObj.contains("icon_off"))
+        {
+            iconOff = btnObj.value("icon_off").toString();
+            icon.addFile(iconOff, QSize(), QIcon::Normal, QIcon::Off);
+            button->setCheckable(true);
+        }
         button->setIcon(icon);
         button->setIconSize(QSize(28, 28));
         button->setFlat(true);
         button->setToolTip(toolTip);
         m_mainLayout->addWidget(button);
         connect(button, &QPushButton::clicked, this,
-                [this, btnObj]()
+                [this, btnObj, button]()
                 {
                     const auto& actionId = btnObj.value("actionId").toString();
                     if (!m_actionMap.contains(actionId))
@@ -97,7 +117,8 @@ CustomMenuBar::CustomMenuBar(QWidget* parent)
                     }
                     else
                     {
-                        m_actionMap[actionId]({});
+                        const auto& val = button->isChecked();
+                        m_actionMap[actionId]({val});
                     }
                 });
     }
@@ -129,9 +150,9 @@ void CustomMenuBar::onRotateButtonClicked(int val)
     emit rotateClicked(val);
 }
 
-void CustomMenuBar::onShowOriginalImg()
+void CustomMenuBar::onShowOriginalImg(const bool visible)
 {
-    emit showOriginalImg();
+    emit showOriginalImg(visible);
 }
 
 void CustomMenuBar::setupUi()
