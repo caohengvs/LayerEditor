@@ -1,14 +1,12 @@
-#pragma once
-
 /**
  * @file: Logger.hpp
  * @brief: 基于spdlog封装的日志记录器
- * @author: Curtis
+ * @author: Curtis Cao
  * @date: 2025-07-16 14:07:09
  * @version: 1.0
  * @email: caohengvs888@gmail.com
  */
-
+#pragma once
 #include <memory>
 #include <mutex>
 #include <ostream>

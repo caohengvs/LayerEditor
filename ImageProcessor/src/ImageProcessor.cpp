@@ -1,16 +1,26 @@
 #include "ImageProcessor.hpp"
 #include <Windows.h>
 #include <onnxruntime_cxx_api.h>
+#include <codecvt>
 #include <filesystem>
 #include <fstream>
+#include <locale>
 #include <magic_enum/magic_enum.hpp>
 #include <opencv2/opencv.hpp>
 #include "Logger.hpp"
+#include "ModelProcImage.hpp"
 
 #ifdef _WIN32
 #include <windows.h>  // For MultiByteToWideChar
 namespace
 {
+/**
+ * @name: Utf8ToWString
+ * @brief: win32API,string2wstring
+ * @param: 参数名 参数描述
+ * @return: 返回值描述
+ */
+[[deprecated("this function not used.use std instead.")]]
 std::wstring Utf8ToWString(const std::string& utf8String)
 {
     if (utf8String.empty())
@@ -22,10 +32,12 @@ std::wstring Utf8ToWString(const std::string& utf8String)
     MultiByteToWideChar(CP_UTF8, 0, &utf8String[0], (int)utf8String.size(), &wstrTo[0], sizeNeeded);
     return wstrTo;
 }
+#endif
 
 std::vector<char> readFileToBuffer(const std::string& path)
 {
-    std::wstring wpath = Utf8ToWString(path);
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    std::wstring wpath = converter.from_bytes(path);
 
     std::ifstream file(wpath, std::ios::binary);
     if (!file.is_open())
@@ -43,7 +55,6 @@ std::vector<char> readFileToBuffer(const std::string& path)
     return buffer;
 }
 }  // namespace
-#endif
 
 ImageProcessor::ImageProcessor(const std::string& path)
     : m_strImgPath(path)
@@ -56,56 +67,13 @@ ImageProcessor::~ImageProcessor()
 
 bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
 {
-    const int MODEL_INPUT_H = 512;
-    const int MODEL_INPUT_W = 512;
-    const char* input_image_name = "image";
-    const char* input_mask_name = "mask";
-    const char* output_result_name = "output";
+    ModelProcImage modelImg("LamaCleanerInference");
 
-    Ort::Env env(ORT_LOGGING_LEVEL_FATAL, "LamaCleanerInference");
-    Ort::SessionOptions session_options;
-    session_options.SetIntraOpNumThreads(1);
-    session_options.SetGraphOptimizationLevel(ORT_ENABLE_EXTENDED);
-    std::wstring w_onnx_model_path(L"models/lama_fp32.onnx");
-    Ort::Session session(env, w_onnx_model_path.c_str(), session_options);
-
-    std::vector<Ort::AllocatedStringPtr> input_name_ptrs;
-    std::vector<const char*> input_node_names;
-    Ort::AllocatorWithDefaultOptions allocator;
-    for (size_t i = 0; i < session.GetInputCount(); ++i)
-    {
-        input_name_ptrs.push_back(session.GetInputNameAllocated(i, allocator));
-        input_node_names.push_back(input_name_ptrs.back().get());
-    }
-
-    std::vector<Ort::AllocatedStringPtr> output_name_ptrs;
-    std::vector<const char*> output_node_names;
-    for (size_t i = 0; i < session.GetOutputCount(); ++i)
-    {
-        output_name_ptrs.push_back(session.GetOutputNameAllocated(i, allocator));
-        output_node_names.push_back(output_name_ptrs.back().get());
-    }
-
-    int image_input_idx = -1;
-    int mask_input_idx = -1;
-    for (size_t i = 0; i < input_node_names.size(); ++i)
-    {
-        if (std::string(input_node_names[i]) == input_image_name)
-        {
-            image_input_idx = i;
-        }
-        else if (std::string(input_node_names[i]) == input_mask_name)
-        {
-            mask_input_idx = i;
-        }
-    }
-
-    if (image_input_idx == -1 || mask_input_idx == -1)
-    {
-        return false;
-    }
+    LOG_INFO << "Init model file:models/lama_fp32.onnx,begin.";
+    modelImg.initModel("models/lama_fp32.onnx");
+    LOG_INFO << "Init model file:models/lama_fp32.onnx,end.";
     cv::Mat src;
-#ifdef _WIN32
+
     std::vector<char> buffer = readFileToBuffer(m_strImgPath);
 
     if (buffer.empty())
@@ -121,20 +89,13 @@ bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
         LOG_ERROR << "Failed to read image from path: " << m_strImgPath;
         return false;
     }
-#else
-    src = cv::imread(m_strImgPath);
-#endif
 
-    m_srcMat = std::make_unique<cv::Mat>(src);
-
-    // --- Smart Cropping Logic Start ---
     int padding = 64;
     int x = std::max(0, maskRegion.x - padding);
     int y = std::max(0, maskRegion.y - padding);
     int w = maskRegion.w + 2 * padding;
     int h = maskRegion.h + 2 * padding;
 
-    // Adjust cropping rect to not exceed image boundaries
     x = std::min(x, src.cols - 1);
     y = std::min(y, src.rows - 1);
     w = std::min(w, src.cols - x);
@@ -143,44 +104,34 @@ bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
     cv::Rect roi(x, y, w, h);
     cv::Mat cropped_src = src(roi).clone();
 
-    // Create a mask for the cropped area
     cv::Mat cropped_mask = cv::Mat::zeros(cropped_src.size(), CV_8U);
     cv::Rect mask_roi_in_cropped_img(maskRegion.x - x, maskRegion.y - y, maskRegion.w, maskRegion.h);
     cv::rectangle(cropped_mask, mask_roi_in_cropped_img, cv::Scalar(255), -1);
 
-    // Resize cropped image and mask to model input size
     cv::Mat resized_src, resized_mask;
     cv::resize(cropped_src, resized_src, cv::Size(MODEL_INPUT_W, MODEL_INPUT_H), 0, 0, cv::INTER_AREA);
     cv::resize(cropped_mask, resized_mask, cv::Size(MODEL_INPUT_W, MODEL_INPUT_H), 0, 0, cv::INTER_NEAREST);
-    // --- Smart Cropping Logic End ---
 
     std::vector<float> input_image_data = preprocess_image(resized_src, MODEL_INPUT_H, MODEL_INPUT_W);
     std::vector<float> input_mask_data = preprocess_mask(resized_mask, MODEL_INPUT_H, MODEL_INPUT_W);
 
-    std::vector<int64_t> image_input_shape = {1, 3, MODEL_INPUT_H, MODEL_INPUT_W};
-    std::vector<int64_t> mask_input_shape = {1, 1, MODEL_INPUT_H, MODEL_INPUT_W};
+    modelImg.addSrc(ModelProcImage::EInputType::Image, input_image_data);
+    modelImg.addSrc(ModelProcImage::EInputType::Mask, input_mask_data);
 
-    Ort::MemoryInfo memory_info =
-        Ort::MemoryInfo::CreateCpu(OrtAllocatorType::OrtArenaAllocator, OrtMemType::OrtMemTypeDefault);
+    modelImg.addShape(ModelProcImage::EInputType::Image, {1, 3, MODEL_INPUT_H, MODEL_INPUT_W});
+    modelImg.addShape(ModelProcImage::EInputType::Mask, {1, 1, MODEL_INPUT_H, MODEL_INPUT_W});
+    LOG_INFO << "Running inference with ONNX Runtime,beign.";
 
-    std::vector<Ort::Value> input_tensors;
-    input_tensors.reserve(2);
-    input_tensors.push_back(Ort::Value::CreateTensor<float>(memory_info, input_image_data.data(),
-                                                            input_image_data.size(), image_input_shape.data(),
-                                                            image_input_shape.size()));
-    input_tensors.push_back(Ort::Value::CreateTensor<float>(memory_info, input_mask_data.data(), input_mask_data.size(),
-                                                            mask_input_shape.data(), mask_input_shape.size()));
+    if (!modelImg.run())
+    {
+        LOG_ERROR << "Running inference with ONNX Runtime,failed.";
 
-    std::vector<const char*> model_input_names_ordered;
-    model_input_names_ordered.resize(2);
-    model_input_names_ordered[image_input_idx] = input_image_name;
-    model_input_names_ordered[mask_input_idx] = input_mask_name;
+        return false;
+    }
 
-    LOG_DEBUG << "Running inference with ONNX Runtime...";
-    auto output_tensors = session.Run(Ort::RunOptions{nullptr}, model_input_names_ordered.data(), input_tensors.data(),
-                                      input_tensors.size(), output_node_names.data(), output_node_names.size());
+    auto output_tensors = modelImg.getOutput();
 
-    LOG_DEBUG << "Running inference with ONNX Runtime over...";
+    LOG_INFO << "Running inference with ONNX Runtime,end.";
 
     float* output_data = output_tensors[0].GetTensorMutableData<float>();
     std::vector<int64_t> output_shape = output_tensors[0].GetTensorTypeAndShapeInfo().GetShape();
@@ -204,18 +155,14 @@ bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
 
     cv::cvtColor(output_image, output_image, cv::COLOR_RGB2BGR);
 
-    // --- Post-processing and Splicing ---
-    // Resize the output back to the cropped image's original size
     cv::resize(output_image, output_image, cropped_src.size(), 0, 0, cv::INTER_LANCZOS4);
 
-    // Apply the restored region back to the original source image
     cv::Mat final_mask = cv::Mat::zeros(src.size(), CV_8U);
     cv::rectangle(final_mask, cv::Rect(maskRegion.x, maskRegion.y, maskRegion.w, maskRegion.h), cv::Scalar(255), -1);
 
     output_image.copyTo(src(roi), cropped_mask);
 
     m_outMat = std::make_unique<cv::Mat>(std::move(src));
-
     return true;
 }
 
@@ -247,7 +194,7 @@ bool ImageProcessor::showTest()
 
 std::optional<ImageProcessor::STImageInfo> ImageProcessor::getImageInfo()
 {
-    if(!m_outMat)
+    if (!m_outMat)
     {
         return std::nullopt;
     }

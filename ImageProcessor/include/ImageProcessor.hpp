@@ -1,12 +1,12 @@
-#pragma once
 /**
  * @file: ImageProcessor.hpp
  * @brief: 图像处理器类
- * @author: Curtis
+ * @author: Curtis Cao
  * @date: 2025-07-22 09:07:45
  * @version: 1.0
  * @email: caohengvs888@gmail.com
  */
+#pragma once
 #include <memory>
 #include <optional>
 #include <string>
@@ -75,6 +75,7 @@ public:
 
 public:
     bool processImageByAI(const STMaskRegion& maskRegion);
+    bool processImageTest(const STMaskRegion& maskRegion);
 
     bool save(const std::string& path);
 
@@ -89,6 +90,9 @@ private:
 
 private:
     std::string m_strImgPath;  // 默认路径
-    std::unique_ptr<cv::Mat> m_srcMat;
-    std::unique_ptr<cv::Mat> m_outMat;
+    std::unique_ptr<cv::Mat> m_srcMat; // 源图像
+    std::unique_ptr<cv::Mat> m_outMat; // 输出图像
+    
+    const int MODEL_INPUT_H = 512;
+    const int MODEL_INPUT_W = 512;
 };
