@@ -1,44 +1,39 @@
 #include "ImageProcessor.hpp"
-#include <Windows.h>
 #include <onnxruntime_cxx_api.h>
-#include <codecvt>
+#include <boost/locale.hpp>
 #include <filesystem>
 #include <fstream>
-#include <locale>
 #include <magic_enum/magic_enum.hpp>
 #include <opencv2/opencv.hpp>
 #include "Logger.hpp"
 #include "ModelProcImage.hpp"
 
-#ifdef _WIN32
-#include <windows.h>  // For MultiByteToWideChar
+// #ifdef _WIN32
+// #include <windows.h>  // For MultiByteToWideChar
+// /**
+//  * @name: Utf8ToWString
+//  * @brief: win32API,string2wstring
+//  * @param: 参数名 参数描述
+//  * @return: 返回值描述
+//  */
+// std::wstring Utf8ToWString(const std::string& utf8String)
+// {
+//     if (utf8String.empty())
+//     {
+//         return std::wstring();
+//     }
+//     int sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, &utf8String[0], (int)utf8String.size(), NULL, 0);
+//     std::wstring wstrTo(sizeNeeded, 0);
+//     MultiByteToWideChar(CP_UTF8, 0, &utf8String[0], (int)utf8String.size(), &wstrTo[0], sizeNeeded);
+//     return wstrTo;
+// }
+// #endif
+
 namespace
 {
-/**
- * @name: Utf8ToWString
- * @brief: win32API,string2wstring
- * @param: 参数名 参数描述
- * @return: 返回值描述
- */
-[[deprecated("this function not used.use std instead.")]]
-std::wstring Utf8ToWString(const std::string& utf8String)
-{
-    if (utf8String.empty())
-    {
-        return std::wstring();
-    }
-    int sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, &utf8String[0], (int)utf8String.size(), NULL, 0);
-    std::wstring wstrTo(sizeNeeded, 0);
-    MultiByteToWideChar(CP_UTF8, 0, &utf8String[0], (int)utf8String.size(), &wstrTo[0], sizeNeeded);
-    return wstrTo;
-}
-#endif
-
 std::vector<char> readFileToBuffer(const std::string& path)
 {
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    std::wstring wpath = converter.from_bytes(path);
-
+    std::wstring wpath = boost::locale::conv::to_utf<wchar_t>(path, "UTF-8");
     std::ifstream file(wpath, std::ios::binary);
     if (!file.is_open())
     {
@@ -70,9 +65,9 @@ bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
     ModelProcImage modelImg("LamaCleanerInference");
 
     LOG_INFO << "Init model file:models/lama_fp32.onnx,begin.";
-    if(!modelImg.initModel("models/lama_fp32.onnx"))
+    if (!modelImg.initModel("models/lama_fp32.onnx"))
     {
-        LOG_ERROR<< "Init model file,failed.";
+        LOG_ERROR << "Init model file,failed.";
         return false;
     }
 

@@ -10,6 +10,7 @@ file(GLOB SOURCES "src/*.cpp" "include/*.hpp")
 
 find_package(OpenCV REQUIRED)
 find_package(magic_enum CONFIG REQUIRED)
+find_package(Boost REQUIRED COMPONENTS locale)
 
 add_library(${PROJECT_NAME} SHARED
     ${SOURCES}
@@ -25,6 +26,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE ${OpenCV_LIBS}
     PRIVATE onnxruntime
     PRIVATE magic_enum::magic_enum
+    PRIVATE Boost::locale
 ) 
 
 target_include_directories(${PROJECT_NAME} PRIVATE

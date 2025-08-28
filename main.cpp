@@ -6,21 +6,12 @@
 #include <iostream>
 #include "Logger.hpp"
 #include "MainWindow.hpp"
-#ifdef Q_OS_WIN
-#include <Windows.h>
-#endif
 
 int main(int argc, char** argv)
 {
     auto& loggger = Logger::getInstance();
     loggger.init("MyApplication", Logger::DEBUG_L, true, false, "logs/app.log");
 
-#ifdef Q_OS_WIN
-    UINT currentCP = GetConsoleOutputCP();
-    SetConsoleOutputCP(CP_UTF8);
-#endif
-
-    QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
     QApplication app(argc, argv);
 
     app.setApplicationName("LayerEditor");
@@ -81,9 +72,6 @@ int main(int argc, char** argv)
                      [&]()
                      {
                          qInfo() << "Application is about to quit.";
-#ifdef Q_OS_WIN
-                         SetConsoleOutputCP(currentCP);
-#endif
                          delete mainWindow;
                          Logger::deleteInstance();
                      });

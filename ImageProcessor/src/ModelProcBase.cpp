@@ -1,7 +1,6 @@
 #include "ModelProcBase.hpp"
-#include <codecvt>
+#include <boost/locale.hpp>
 #include <filesystem>
-#include <locale>
 #include "Logger.hpp"
 
 ModelProcBase::ModelProcBase(const std::string& name)
@@ -24,8 +23,7 @@ bool ModelProcBase::initModel(const std::string& path)
         return false;
     }
     m_model.clear();
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    std::wstring wModelpath = converter.from_bytes(path);
+    std::wstring wModelpath = boost::locale::conv::to_utf<wchar_t>(path, "UTF-8");
     auto session = std::make_unique<Ort::Session>(m_env, wModelpath.c_str(), m_sessionOptions);
     Ort::AllocatorWithDefaultOptions allocator;
     std::vector<const char*> inputNames, outputNames;

@@ -107,6 +107,14 @@
         "typeindex": "cpp",
         "unordered_set": "cpp",
         "qgraphicstextitem": "cpp",
-        "qtextcodec": "cpp"
+        "qtextcodec": "cpp",
+        "csignal": "cpp",
+        "cwctype": "cpp",
+        "execution": "cpp",
+        "memory_resource": "cpp",
+        "shared_mutex": "cpp",
+        "stdfloat": "cpp",
+        "strstream": "cpp",
+        "valarray": "cpp"
     } // Helps with older files
 }

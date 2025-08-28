@@ -7,7 +7,8 @@
     "spdlog",
     "gtest",
     "opencv4",
-    "magic-enum"
+    "magic-enum",
+    "boost-locale"
   ],
   "overrides": [
     {
