@@ -70,7 +70,12 @@ bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
     ModelProcImage modelImg("LamaCleanerInference");
 
     LOG_INFO << "Init model file:models/lama_fp32.onnx,begin.";
-    modelImg.initModel("models/lama_fp32.onnx");
+    if(!modelImg.initModel("models/lama_fp32.onnx"))
+    {
+        LOG_ERROR<< "Init model file,failed.";
+        return false;
+    }
+
     LOG_INFO << "Init model file:models/lama_fp32.onnx,end.";
     cv::Mat src;
 

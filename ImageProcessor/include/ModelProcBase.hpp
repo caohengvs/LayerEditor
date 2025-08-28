@@ -28,6 +28,14 @@ class ModelProcBase
         void clear()
         {
             session.reset();
+            for (auto name : inputNames)
+            {
+                delete[] name;
+            }
+            for (auto name : outputNames)
+            {
+                delete[] name;
+            }
             inputNames.clear();
             outputNames.clear();
             modelPath.clear();

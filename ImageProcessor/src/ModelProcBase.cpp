@@ -1,6 +1,8 @@
 #include "ModelProcBase.hpp"
 #include <codecvt>
+#include <filesystem>
 #include <locale>
+#include "Logger.hpp"
 
 ModelProcBase::ModelProcBase(const std::string& name)
     : m_env(ORT_LOGGING_LEVEL_WARNING, name.c_str())
@@ -11,10 +13,16 @@ ModelProcBase::ModelProcBase(const std::string& name)
 
 ModelProcBase::~ModelProcBase()
 {
+    m_model.clear();
 }
 
 bool ModelProcBase::initModel(const std::string& path)
 {
+    if (!std::filesystem::exists(path))
+    {
+        LOG_ERROR << "model is not find:" << path;
+        return false;
+    }
     m_model.clear();
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     std::wstring wModelpath = converter.from_bytes(path);
@@ -22,9 +30,23 @@ bool ModelProcBase::initModel(const std::string& path)
     Ort::AllocatorWithDefaultOptions allocator;
     std::vector<const char*> inputNames, outputNames;
     for (size_t i = 0; i < session->GetInputCount(); ++i)
-        inputNames.push_back(session->GetInputNameAllocated(i, allocator).get());
+    {
+        auto ort_name_ptr = session->GetInputNameAllocated(i, allocator);
+        const char* name = ort_name_ptr.get();
+
+        char* new_name = new char[strlen(name) + 1];
+        strcpy(new_name, name);
+        inputNames.push_back(new_name);
+    }
     for (size_t i = 0; i < session->GetOutputCount(); ++i)
-        outputNames.push_back(session->GetOutputNameAllocated(i, allocator).get());
+    {
+        auto ort_name_ptr = session->GetOutputNameAllocated(i, allocator);
+        const char* name = ort_name_ptr.get();
+
+        char* new_name = new char[strlen(name) + 1];
+        strcpy(new_name, name);
+        outputNames.push_back(new_name);
+    }
 
     m_model = {std::move(session), inputNames, outputNames, path};
 

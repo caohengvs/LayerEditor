@@ -29,9 +29,6 @@ bool ModelProcImage::run()
     input_tensors.push_back(Ort::Value::CreateTensor<float>(memory_info, input_mask_data.data(), input_mask_data.size(),
                                                             mask_input_shape.data(), mask_input_shape.size()));
 
-    // m_model.inputNames[0] = "image";
-    // m_model.inputNames[1] = "mask";
-    // m_model.outputNames[0] = "output";
     try
     {
         m_output =
