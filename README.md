@@ -26,7 +26,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/caohengvs/LayerEditor.git
+git clone git@gitee.com:caohengpy/LayerEditor.git
 cd LayerEditor
 
 # Configure
