@@ -113,12 +113,8 @@ bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
     cv::Rect mask_roi_in_cropped_img(maskRegion.x - x, maskRegion.y - y, maskRegion.w, maskRegion.h);
     cv::rectangle(cropped_mask, mask_roi_in_cropped_img, cv::Scalar(255), -1);
 
-    cv::Mat resized_src, resized_mask;
-    cv::resize(cropped_src, resized_src, cv::Size(MODEL_INPUT_W, MODEL_INPUT_H), 0, 0, cv::INTER_AREA);
-    cv::resize(cropped_mask, resized_mask, cv::Size(MODEL_INPUT_W, MODEL_INPUT_H), 0, 0, cv::INTER_NEAREST);
-
-    std::vector<float> input_image_data = preprocess_image(resized_src, MODEL_INPUT_H, MODEL_INPUT_W);
-    std::vector<float> input_mask_data = preprocess_mask(resized_mask, MODEL_INPUT_H, MODEL_INPUT_W);
+    std::vector<float> input_image_data = preprocess_image(cropped_src, MODEL_INPUT_H, MODEL_INPUT_W);
+    std::vector<float> input_mask_data = preprocess_mask(cropped_mask, MODEL_INPUT_H, MODEL_INPUT_W);
 
     modelImg.addSrc(ModelProcImage::EInputType::Image, input_image_data);
     modelImg.addSrc(ModelProcImage::EInputType::Mask, input_mask_data);
