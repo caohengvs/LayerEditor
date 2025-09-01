@@ -1,10 +1,11 @@
 #pragma once
-#include <QWidget>
 #include <QJsonArray>
-#include <QSignalMapper>
 #include <QMap>
-#include <functional>
+#include <QSignalMapper>
+#include <QWidget>
 #include <any>
+#include <functional>
+
 
 class QHBoxLayout;
 
@@ -30,13 +31,13 @@ private:
     void onDoneButtonClicked();
     void onRotateButtonClicked(const int dir);
     void onShowOriginalImg(const bool visible);
-    
+
 private:
     void setupUi();
-    bool readConfig(const QString& config,  QJsonArray& outJson);
+    bool readConfig(const QString& config, QJsonArray& outJson);
     void addAction(const QString& actionId, const std::function<void(const std::vector<std::any>& args)>& action);
 
 private:
     QHBoxLayout* m_mainLayout;
-    QMap<QString,std::function<void(const std::vector<std::any>&)>> m_actionMap;
+    QMap<QString, std::function<void(const std::vector<std::any>&)>> m_actionMap;
 };

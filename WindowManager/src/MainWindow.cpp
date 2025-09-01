@@ -94,17 +94,12 @@ void MainWindow::init()
                 bShow = !bShow;
             });
 
-    connect(customMenuBar, &CustomMenuBar::doneClicked, this, [scene]() { 
-        scene->processImage();
-     });
+    connect(customMenuBar, &CustomMenuBar::doneClicked, this, [scene]() { scene->processImage(); });
 
-    connect(customMenuBar, &CustomMenuBar::rotateClicked,
-            [view, scene](const auto val)
-            {
-                view->rotate(val);
-            });
+    connect(customMenuBar, &CustomMenuBar::rotateClicked, [view, scene](const auto val) { view->rotate(val); });
 
     connect(view, &CustomView::filesDropped, this, [scene](const auto& filePath) { scene->loadImage(filePath); });
 
-     connect(customMenuBar, &CustomMenuBar::showOriginalImg, this, [scene](const auto val) { scene->showOriginalImg(val); });
+    connect(customMenuBar, &CustomMenuBar::showOriginalImg, this,
+            [scene](const auto val) { scene->showOriginalImg(val); });
 }

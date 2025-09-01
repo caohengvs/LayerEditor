@@ -1,11 +1,12 @@
 #include "Logger.hpp"
 #include <spdlog/async.h>
+#include <spdlog/sinks/msvc_sink.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/sinks/msvc_sink.h>
 #include <spdlog/spdlog.h>
 #include <sstream>
 #include <vector>
+
 
 struct LoggerImpl
 {
@@ -37,8 +38,6 @@ struct LoggerImpl
     LoggerImpl() = default;
 
     ~LoggerImpl() = default;
-
-
 };
 
 Logger::Logger()
@@ -171,8 +170,8 @@ Logger::LogStream::~LogStream()
 {
     if (pimpl_ && pimpl_->logger_)
     {
-        pimpl_->logger_->log({pimpl_->file_, pimpl_->line_, pimpl_->func_},
-                             LoggerImpl::mapLogLevel(pimpl_->level_), pimpl_->ss_.str());
+        pimpl_->logger_->log({pimpl_->file_, pimpl_->line_, pimpl_->func_}, LoggerImpl::mapLogLevel(pimpl_->level_),
+                             pimpl_->ss_.str());
     }
 }
 

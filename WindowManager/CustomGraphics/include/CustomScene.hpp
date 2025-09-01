@@ -1,13 +1,14 @@
 #pragma once
+#include <ImageProcessor.hpp>
 #include <QGraphicsRectItem>
 #include <QGraphicsScene>
 #include <QKeyEvent>
 #include <QPointer>
 #include <RotatingRectItem.hpp>
+#include <optional>
 #include <unordered_map>
 #include <variant>
-#include <optional>
-#include <ImageProcessor.hpp>
+
 class CustomView;
 
 class CustomScene final : public QGraphicsScene
@@ -52,6 +53,6 @@ private:
     void adjustImg(QGraphicsPixmapItem* item);
 
 private:
-    ItemMap m_itemMap;  
+    ItemMap m_itemMap;
     std::optional<ImageProcessor::STImageInfo> m_stInfo = std::nullopt;
 };

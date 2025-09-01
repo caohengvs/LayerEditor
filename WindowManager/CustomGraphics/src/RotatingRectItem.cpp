@@ -1,9 +1,10 @@
 #include "RotatingRectItem.hpp"
 #include <QBrush>
-#include <QDebug>
-#include <QPen>
-#include <QPainter>
 #include <QConicalGradient>
+#include <QDebug>
+#include <QPainter>
+#include <QPen>
+
 
 RotatingRectItem::RotatingRectItem(const QRectF& rect, QGraphicsItem* parent)
     : QGraphicsRectItem(rect, parent)
@@ -25,21 +26,21 @@ void RotatingRectItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
 {
     painter->setRenderHint(QPainter::Antialiasing, true);
 
-    QRectF r = rect().adjusted(8, 8, -8, -8); // 留出宽度
+    QRectF r = rect().adjusted(8, 8, -8, -8);  // 留出宽度
     qreal arcWidth = 12.0;
 
     // 渐变色
     QConicalGradient gradient(r.center(), -rotation());
-    gradient.setColorAt(0.0, QColor(0, 120, 255, 255)); // 深色
-    gradient.setColorAt(0.7, QColor(0, 200, 255, 180)); // 浅色
-    gradient.setColorAt(1.0, QColor(0, 120, 255, 0));   // 透明
+    gradient.setColorAt(0.0, QColor(0, 120, 255, 255));  // 深色
+    gradient.setColorAt(0.7, QColor(0, 200, 255, 180));  // 浅色
+    gradient.setColorAt(1.0, QColor(0, 120, 255, 0));    // 透明
 
     QPen pen(QBrush(gradient), arcWidth, Qt::SolidLine, Qt::RoundCap);
     painter->setPen(pen);
     painter->setBrush(Qt::NoBrush);
 
     // 画一段弧（比如270°）
-    int spanAngle = 270 * 16; // Qt角度单位为1/16°
+    int spanAngle = 270 * 16;  // Qt角度单位为1/16°
     int startAngle = 0 * 16;
     painter->drawArc(r, startAngle, spanAngle);
 }

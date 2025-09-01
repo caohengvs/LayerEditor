@@ -13,7 +13,6 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-
 class CustomFileListWidget : public QWidget
 {
     Q_OBJECT

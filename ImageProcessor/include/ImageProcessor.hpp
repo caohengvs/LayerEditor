@@ -89,10 +89,10 @@ private:
     std::vector<float> preprocess_mask(const cv::Mat& mask, int target_h, int target_w);
 
 private:
-    std::string m_strImgPath;  // 默认路径
-    std::unique_ptr<cv::Mat> m_srcMat; // 源图像
-    std::unique_ptr<cv::Mat> m_outMat; // 输出图像
-    
+    std::string m_strImgPath;           // 默认路径
+    std::unique_ptr<cv::Mat> m_srcMat;  // 源图像
+    std::unique_ptr<cv::Mat> m_outMat;  // 输出图像
+
     const int MODEL_INPUT_H = 512;
     const int MODEL_INPUT_W = 512;
 };

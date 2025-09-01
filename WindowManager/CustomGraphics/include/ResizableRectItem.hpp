@@ -3,7 +3,6 @@
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneMouseEvent>
 
-
 class ResizableRectItem : public QGraphicsRectItem
 {
 public:
