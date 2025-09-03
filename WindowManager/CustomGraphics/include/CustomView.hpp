@@ -22,6 +22,7 @@ public:
 
 public:
     void rotate(qreal angle);
+    void showCut(const bool visible);
 
 private:
     void wheelEvent(QWheelEvent* event) override;
@@ -30,10 +31,17 @@ private:
     void dragMoveEvent(QDragMoveEvent* event) override;
     void dragLeaveEvent(QDragLeaveEvent* event) override;
     void dropEvent(QDropEvent* event) override;
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
 
+private:
+    void init();
 signals:
     void filesDropped(const QString& filePaths);
 
 private:
-    void init();
+    QPointF m_startPoint;
+    QGraphicsRectItem* m_rectItem = nullptr;
+    bool m_showCut;
 };

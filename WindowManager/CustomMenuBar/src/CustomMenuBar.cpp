@@ -11,63 +11,7 @@
 CustomMenuBar::CustomMenuBar(QWidget* parent)
     : QWidget(parent)
 {
-    addAction("101", [this](const auto& args) { this->onSaveButtonClicked(); });
-    addAction("102", [this](const auto& args) { this->onRemoveButtonClicked(); });
-    addAction("103", [this](const auto& args) { this->onDoneButtonClicked(); });
-    addAction("104",
-              [this](const auto& args)
-              {
-                  if (args.size() != 1)
-                  {
-                      return;
-                  }
-                  try
-                  {
-                      int val = std::any_cast<int>(args[0]);
-                      this->onRotateButtonClicked(val);
-                  }
-                  catch (const std::bad_any_cast& e)
-                  {
-                      qWarning() << "Error: Invalid argument types for 'print_info'. " << e.what();
-                  }
-              });
-
-    addAction("105",
-              [this](const auto& args)
-              {
-                  if (args.size() != 1)
-                  {
-                      return;
-                  }
-                  try
-                  {
-                      int val = std::any_cast<int>(args[0]);
-                      this->onRotateButtonClicked(val);
-                  }
-                  catch (const std::bad_any_cast& e)
-                  {
-                      qWarning() << "Error: Invalid argument types for 'print_info'. " << e.what();
-                  }
-              });
-
-    addAction("106",
-              [this](const auto& args)
-              {
-                  if (args.size() != 1)
-                  {
-                      return;
-                  }
-                  try
-                  {
-                      bool val = std::any_cast<bool>(args[0]);
-                      this->onShowOriginalImg(val);
-                  }
-                  catch (const std::bad_any_cast& e)
-                  {
-                      qWarning() << "Error: Invalid argument types for 'print_info'. " << e.what();
-                  }
-              });
-
+    initActions();
     setupUi();
 
     QJsonArray btnConfig;
@@ -153,6 +97,73 @@ void CustomMenuBar::onRotateButtonClicked(int val)
 void CustomMenuBar::onShowOriginalImg(const bool visible)
 {
     emit showOriginalImg(visible);
+}
+
+void CustomMenuBar::onCutButtonClicked()
+{
+    emit cutClicked();
+}
+
+void CustomMenuBar::initActions()
+{
+    addAction("101", [this](const auto& args) { this->onSaveButtonClicked(); });
+    addAction("102", [this](const auto& args) { this->onRemoveButtonClicked(); });
+    addAction("103", [this](const auto& args) { this->onDoneButtonClicked(); });
+    addAction("104",
+              [this](const auto& args)
+              {
+                  if (args.size() != 1)
+                  {
+                      return;
+                  }
+                  try
+                  {
+                      int val = std::any_cast<int>(args[0]);
+                      this->onRotateButtonClicked(val);
+                  }
+                  catch (const std::bad_any_cast& e)
+                  {
+                      qWarning() << "Error: Invalid argument types for 'print_info'. " << e.what();
+                  }
+              });
+
+    addAction("105",
+              [this](const auto& args)
+              {
+                  if (args.size() != 1)
+                  {
+                      return;
+                  }
+                  try
+                  {
+                      int val = std::any_cast<int>(args[0]);
+                      this->onRotateButtonClicked(val);
+                  }
+                  catch (const std::bad_any_cast& e)
+                  {
+                      qWarning() << "Error: Invalid argument types for 'print_info'. " << e.what();
+                  }
+              });
+
+    addAction("106",
+              [this](const auto& args)
+              {
+                  if (args.size() != 1)
+                  {
+                      return;
+                  }
+                  try
+                  {
+                      bool val = std::any_cast<bool>(args[0]);
+                      this->onShowOriginalImg(val);
+                  }
+                  catch (const std::bad_any_cast& e)
+                  {
+                      qWarning() << "Error: Invalid argument types for 'print_info'. " << e.what();
+                  }
+              });
+
+    addAction("107", [this](const auto& args) { this->onCutButtonClicked(); });
 }
 
 void CustomMenuBar::setupUi()

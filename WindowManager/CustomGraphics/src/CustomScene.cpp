@@ -70,9 +70,10 @@ bool CustomScene::processImage()
             show(ItemType::RotatingRectItem);
             qDebug() << "Rotation animation start.";
 
-            ImageProcessor imageProcessor(path.toStdString());
-            imageProcessor.processImageByAI({static_cast<int>(rc.x()), static_cast<int>(rc.y()),
-                                             static_cast<int>(rc.width()), static_cast<int>(rc.height())});
+            ImageProcessor imageProcessor;
+            imageProcessor.processImageByAI(
+                path.toStdString(), {static_cast<int>(rc.x()), static_cast<int>(rc.y()), static_cast<int>(rc.width()),
+                                     static_cast<int>(rc.height())});
 
             m_stInfo = imageProcessor.getImageInfo();
         },

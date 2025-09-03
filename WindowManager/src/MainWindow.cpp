@@ -94,6 +94,14 @@ void MainWindow::init()
                 bShow = !bShow;
             });
 
+    connect(customMenuBar, &CustomMenuBar::cutClicked, this,
+            [view]()
+            {
+                static bool bShow = true;
+                view->showCut(bShow);
+                bShow = !bShow;
+            });
+
     connect(customMenuBar, &CustomMenuBar::doneClicked, this, [scene]() { scene->processImage(); });
 
     connect(customMenuBar, &CustomMenuBar::rotateClicked, [view, scene](const auto val) { view->rotate(val); });

@@ -25,9 +25,14 @@
         {
             "icon": ":/icons/original.svg",
             "icon_off": ":/icons/hideOriginal.svg",
-            "state":true,
+            "state": true,
             "tip": "原图(显示/隐藏)",
             "actionId": "106"
+        },
+        {
+            "icon": ":/icons/cut.svg",
+            "tip": "裁剪",
+            "actionId": "107"
         }
     ]
 }

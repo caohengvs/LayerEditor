@@ -70,12 +70,11 @@ public:
     using PSTImageInfo = STImageInfo*;
 
 public:
-    explicit ImageProcessor(const std::string& path);
+    ImageProcessor();
     ~ImageProcessor();
 
 public:
-    bool processImageByAI(const STMaskRegion& maskRegion);
-    bool processImageTest(const STMaskRegion& maskRegion);
+    bool processImageByAI(const std::string& path, const STMaskRegion& maskRegion);
 
     bool save(const std::string& path);
 
@@ -89,7 +88,6 @@ private:
     std::vector<float> preprocess_mask(const cv::Mat& mask, int target_h, int target_w);
 
 private:
-    std::string m_strImgPath;           // 默认路径
     std::unique_ptr<cv::Mat> m_srcMat;  // 源图像
     std::unique_ptr<cv::Mat> m_outMat;  // 输出图像
 

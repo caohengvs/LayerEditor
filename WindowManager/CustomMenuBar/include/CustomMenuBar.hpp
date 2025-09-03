@@ -24,6 +24,7 @@ signals:
     void doneClicked();
     void rotateClicked(const int dir);
     void showOriginalImg(const bool visible);
+    void cutClicked();
 
 private:
     void onSaveButtonClicked();
@@ -31,6 +32,8 @@ private:
     void onDoneButtonClicked();
     void onRotateButtonClicked(const int dir);
     void onShowOriginalImg(const bool visible);
+    void onCutButtonClicked();
+    void initActions();
 
 private:
     void setupUi();

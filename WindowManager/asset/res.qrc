@@ -11,5 +11,6 @@
     <file>clockwise.svg</file>
     <file>original.svg</file>
     <file>hideOriginal.svg</file>
+    <file>cut.svg</file>
 </qresource>
 </RCC>

@@ -51,8 +51,7 @@ std::vector<char> readFileToBuffer(const std::string& path)
 }
 }  // namespace
 
-ImageProcessor::ImageProcessor(const std::string& path)
-    : m_strImgPath(path)
+ImageProcessor::ImageProcessor()
 {
 }
 
@@ -60,7 +59,7 @@ ImageProcessor::~ImageProcessor()
 {
 }
 
-bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
+bool ImageProcessor::processImageByAI(const std::string& path,const STMaskRegion& maskRegion)
 {
     ModelProcImage modelImg("LamaCleanerInference");
 
@@ -73,12 +72,11 @@ bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
 
     LOG_INFO << "Init model file:models/lama_fp32.onnx,end.";
     cv::Mat src;
-
-    std::vector<char> buffer = readFileToBuffer(m_strImgPath);
+    std::vector<char> buffer = readFileToBuffer(path);
 
     if (buffer.empty())
     {
-        LOG_ERROR << "无法读取文件到内存: " << m_strImgPath << std::endl;
+        LOG_ERROR << "无法读取文件到内存: " << path << std::endl;
         return false;
     }
 
@@ -86,7 +84,7 @@ bool ImageProcessor::processImageByAI(const STMaskRegion& maskRegion)
 
     if (src.empty())
     {
-        LOG_ERROR << "Failed to read image from path: " << m_strImgPath;
+        LOG_ERROR << "Failed to read image from path: " << path;
         return false;
     }
 
